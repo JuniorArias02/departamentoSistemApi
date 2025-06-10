@@ -20,7 +20,7 @@ class Averages extends AggregateBase
      *
      * @return float|string (string if result is an error)
      */
-    public static function averageDeviations(mixed ...$args): string|float
+    public static function averageDeviations(...$args)
     {
         $aArgs = Functions::flattenArrayIndexed($args);
 
@@ -44,8 +44,6 @@ class Averages extends AggregateBase
                 return ExcelError::VALUE();
             }
             if (self::isAcceptedCountable($arg, $k)) {
-                /** @var float|int|numeric-string $arg */
-                /** @var float|int|numeric-string $aMean */
                 $returnValue += abs($arg - $aMean);
                 ++$aCount;
             }
@@ -69,9 +67,9 @@ class Averages extends AggregateBase
      *
      * @param mixed ...$args Data values
      *
-     * @return float|int|string (string if result is an error)
+     * @return float|string (string if result is an error)
      */
-    public static function average(mixed ...$args): string|int|float
+    public static function average(...$args)
     {
         $returnValue = $aCount = 0;
 
@@ -85,7 +83,6 @@ class Averages extends AggregateBase
                 return ExcelError::VALUE();
             }
             if (self::isAcceptedCountable($arg, $k)) {
-                /** @var float|int|numeric-string $arg */
                 $returnValue += $arg;
                 ++$aCount;
             }
@@ -109,9 +106,9 @@ class Averages extends AggregateBase
      *
      * @param mixed ...$args Data values
      *
-     * @return float|int|string (string if result is an error)
+     * @return float|string (string if result is an error)
      */
-    public static function averageA(mixed ...$args): string|int|float
+    public static function averageA(...$args)
     {
         $returnValue = null;
 
@@ -150,7 +147,7 @@ class Averages extends AggregateBase
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function median(mixed ...$args): float|string
+    public static function median(...$args)
     {
         $aArgs = Functions::flattenArray($args);
 
@@ -164,7 +161,7 @@ class Averages extends AggregateBase
             if ($valueCount == floor($valueCount)) {
                 $returnValue = ($aArgs[$valueCount--] + $aArgs[$valueCount]) / 2;
             } else {
-                $valueCount = (int) floor($valueCount);
+                $valueCount = floor($valueCount);
                 $returnValue = $aArgs[$valueCount];
             }
         }
@@ -184,7 +181,7 @@ class Averages extends AggregateBase
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function mode(mixed ...$args): float|string
+    public static function mode(...$args)
     {
         $returnValue = ExcelError::NA();
 
@@ -203,9 +200,9 @@ class Averages extends AggregateBase
     {
         return array_filter(
             $args,
-            function ($value): bool {
+            function ($value) {
                 // Is it a numeric value?
-                return is_numeric($value) && (!is_string($value));
+                return  is_numeric($value) && (!is_string($value));
             }
         );
     }
@@ -213,8 +210,10 @@ class Averages extends AggregateBase
     /**
      * Special variant of array_count_values that isn't limited to strings and integers,
      * but can work with floating point numbers as values.
+     *
+     * @return float|string
      */
-    private static function modeCalc(array $data): float|string
+    private static function modeCalc(array $data)
     {
         $frequencyArray = [];
         $index = 0;

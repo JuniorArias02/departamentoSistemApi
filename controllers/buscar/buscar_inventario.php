@@ -17,17 +17,19 @@ $condicionesTexto = [];
 $condicionesOtros = [];
 $params = [];
 
-if (!empty($data['codigo'])) {
-    $condicionesTexto[] = "i.codigo LIKE :codigo";
-    $condicionesTexto[] = "i.serial LIKE :serial";
-    $params[':codigo'] = "%" . $data['codigo'] . "%";
-    $params[':serial'] = "%" . $data['codigo'] . "%";
+if (!empty($data['filtroTexto'])) {
+    $condicionesTexto[] = "i.codigo LIKE :filtroTexto";
+    $condicionesTexto[] = "i.serial LIKE :filtroTexto";
+    $condicionesTexto[] = "i.dependencia LIKE :filtroTexto";
+    $condicionesTexto[] = "i.nombre LIKE :filtroTexto";
+    $params[':filtroTexto'] = "%" . $data['filtroTexto'] . "%";
 }
 
 if (!empty($data['sede_nombre'])) {
     $condicionesOtros[] = "s.nombre LIKE :sede_nombre";
     $params[':sede_nombre'] = "%" . $data['sede_nombre'] . "%";
 }
+
 
 $whereTexto = "";
 if (!empty($condicionesTexto)) {
@@ -61,3 +63,4 @@ try {
 	http_response_code(500);
 	echo json_encode(["error" => "Error al buscar inventario: " . $e->getMessage()]);
 }
+

@@ -17,8 +17,8 @@ $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
 $headers = [
-    "ID", "Código", "Nombre", "Dependencia", "Responsable",
-    "Marca", "Modelo", "Serial", "Sede", "Creado Por", "Fecha Creación"
+    "ID", "Codigo", "Nombre", "Dependencia", "Responsable",
+    "Marca", "Modelo", "Serial", "Sede", "Creado Por", "Fecha Creacion"
 ];
 
 // Estilo para encabezados

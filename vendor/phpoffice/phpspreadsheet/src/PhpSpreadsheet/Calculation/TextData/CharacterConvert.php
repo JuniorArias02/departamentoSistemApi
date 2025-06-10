@@ -3,7 +3,6 @@
 namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 
@@ -21,18 +20,13 @@ class CharacterConvert
      *         If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function character(mixed $character): array|string
+    public static function character($character)
     {
         if (is_array($character)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $character);
         }
 
-        try {
-            $character = Helpers::validateInt($character, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
-        }
-
+        $character = Helpers::validateInt($character);
         $min = Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE ? 0 : 1;
         if ($character < $min || $character > 255) {
             return ExcelError::VALUE();
@@ -52,18 +46,13 @@ class CharacterConvert
      *         If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function code(mixed $characters): array|string|int
+    public static function code($characters)
     {
         if (is_array($characters)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $characters);
         }
 
-        try {
-            $characters = Helpers::extractString($characters, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
-        }
-
+        $characters = Helpers::extractString($characters);
         if ($characters === '') {
             return ExcelError::VALUE();
         }
@@ -81,7 +70,6 @@ class CharacterConvert
         $retVal = 0;
         $iconv = iconv('UTF-8', 'UCS-4LE', $character);
         if ($iconv !== false) {
-            /** @var false|int[] */
             $result = unpack('V', $iconv);
             if (is_array($result) && isset($result[1])) {
                 $retVal = $result[1];
