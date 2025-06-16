@@ -28,7 +28,7 @@ foreach ($campos as $campo) {
 
 try {
     if (!empty($data['id'])) {
-        // EDITAR INVENTARIO
+        // EDITAR INVENTARIO - Parte existente
         $stmt = $pdo->prepare("UPDATE inventario SET 
             codigo = :codigo,
             nombre = :nombre,
@@ -53,7 +53,20 @@ try {
             "id" => $data["id"]
         ]);
 
-        // Traer datos actualizados
+        // REGISTRAR ACTIVIDAD DE ACTUALIZACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, NOW())");
+        
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Actualizó el item '".$data["nombre"]."' en el inventario",
+            "tabla_afectada" => "inventario",
+            "registro_id" => $data["id"]
+        ]);
+
+        // Traer datos actualizados (parte existente)
         $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
         $stmt2->execute(["id" => $data["id"]]);
         $registro = $stmt2->fetch(PDO::FETCH_ASSOC);
@@ -64,7 +77,7 @@ try {
         ]);
 
     } else {
-        // CREAR INVENTARIO
+        // CREAR INVENTARIO - Parte existente
         $stmt = $pdo->prepare("INSERT INTO inventario 
             (codigo, nombre, dependencia, responsable, marca, modelo, serial, sede_id, creado_por)
             VALUES 
@@ -84,7 +97,20 @@ try {
 
         $idInsertado = $pdo->lastInsertId();
 
-        // Traer datos insertados
+        // REGISTRAR ACTIVIDAD DE CREACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, NOW())");
+        
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Creó el item '".$data["nombre"]."' en el inventario",
+            "tabla_afectada" => "inventario",
+            "registro_id" => $idInsertado
+        ]);
+
+        // Traer datos insertados (parte existente)
         $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
         $stmt2->execute(["id" => $idInsertado]);
         $registro = $stmt2->fetch(PDO::FETCH_ASSOC);

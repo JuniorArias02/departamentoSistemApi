@@ -15,8 +15,14 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 // Validar campos obligatorios
 $camposObligatorios = [
-    "titulo", "codigo", "modelo", "dependencia",
-    "sede_id", "nombre_receptor", "creado_por", "imagen"
+    "titulo",
+    "codigo",
+    "modelo",
+    "dependencia",
+    "sede_id",
+    "nombre_receptor",
+    "creado_por",
+    "imagen"
 ];
 
 foreach ($camposObligatorios as $campo) {
@@ -99,6 +105,18 @@ try {
             "id" => $data["id"]
         ]);
 
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, NOW())");
+
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Actualizó el mantenimiento IPS '" . $data["titulo"] . "'",
+            "tabla_afectada" => "mantenimientos",
+            "registro_id" => $data["id"]
+        ]);
+
         echo json_encode(["msg" => "Mantenimiento de freezer actualizado con éxito"]);
     } else {
         $stmt = $pdo->prepare("INSERT INTO mantenimientos_freezer 
@@ -119,6 +137,22 @@ try {
             "descripcion" => $data["descripcion"] ?? null,
             "creado_por" => $data["creado_por"]
         ]);
+
+        $idInsertado = $pdo->lastInsertId();
+
+        // REGISTRAR ACTIVIDAD DE CREACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, NOW())");
+
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Creó el mantenimiento de IPS'" . $data["titulo"] . "'",
+            "tabla_afectada" => "mantenimientos",
+            "registro_id" => $idInsertado
+        ]);
+
 
         echo json_encode([
             "msg" => "Mantenimiento de freezer registrado con éxito",

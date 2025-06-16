@@ -1,0 +1,62 @@
+<?php
+require_once '../../database/conexion.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+header("Access-Control-Allow-Origin:*");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Content-Type: application/json");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+try {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (
+        !isset($data['id']) || 
+        !isset($data['nombre_completo']) ||
+        !isset($data['correo']) ||
+        !isset($data['telefono'])
+    ) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Faltan datos requeridos'
+        ]);
+        exit();
+    }
+
+    $id = filter_var($data['id'], FILTER_VALIDATE_INT);
+    $nombre = trim($data['nombre_completo']);
+    $correo = trim($data['correo']);
+    $telefono = trim($data['telefono']);
+
+    $sql = "UPDATE usuarios 
+            SET nombre_completo = :nombre, correo = :correo, telefono = :telefono 
+            WHERE id = :id";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':nombre', $nombre);
+    $stmt->bindParam(':correo', $correo);
+    $stmt->bindParam(':telefono', $telefono);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+    $stmt->execute();
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Perfil actualizado correctamente'
+    ]);
+    
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error al actualizar perfil: ' . $e->getMessage()
+    ]);
+}
