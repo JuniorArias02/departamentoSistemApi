@@ -3,7 +3,7 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_get.php';
 
 try {
-	$sql = "SELECT DATE(fecha_creacion) AS fecha, COUNT(*) AS total, us.nombre_completo FROM mantenimientos JOIN usuarios AS us ON mantenimientos_freezer.creado_por = us.id GROUP BY DATE(fecha_creacion), us.nombre_completo ORDER BY fecha ASC";
+	$sql = "SELECT DATE(fecha_creacion) AS fecha, COUNT(*) AS total, us.nombre_completo FROM mantenimientos JOIN usuarios AS us ON mantenimientos.creado_por = us.id GROUP BY DATE(fecha_creacion), us.nombre_completo ORDER BY fecha ASC";
 	$stmt = $pdo->query($sql);
 	$resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
