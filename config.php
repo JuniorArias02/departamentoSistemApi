@@ -1,8 +1,7 @@
 <?php
 return [
     'host' => 'localhost',
-    'dbname' => 'psicolog_formularioWebTEMP',
+    'dbname' => 'formularioweb',
     'user' => 'root',
-    'pass' => 'root',
+    'pass' => 'root'
 ];
-

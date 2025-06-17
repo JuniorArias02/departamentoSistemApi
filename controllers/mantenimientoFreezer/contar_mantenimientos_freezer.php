@@ -1,7 +1,7 @@
 <?php
 require_once '../../database/conexion.php';
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Content-Type: application/json");
@@ -12,12 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 try {
-    // Consulta directa sin filtros
+
     $sql = "SELECT COUNT(*) AS total FROM mantenimientos_freezer";
     $stmt = $pdo->query($sql);
     $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Respuesta mínima: solo el número total
     echo json_encode(["total" => (int)$resultado['total']]);
 
 } catch (PDOException $e) {

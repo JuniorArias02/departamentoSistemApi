@@ -1,10 +1,11 @@
 <?php
 require_once '../../database/conexion.php';
+date_default_timezone_set('America/Bogota');
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
@@ -28,7 +29,7 @@ foreach ($campos as $campo) {
 
 try {
     if (!empty($data['id'])) {
-        // EDITAR INVENTARIO
+        // EDITAR INVENTARIO - Parte existente
         $stmt = $pdo->prepare("UPDATE inventario SET 
             codigo = :codigo,
             nombre = :nombre,
@@ -52,8 +53,23 @@ try {
             "sede_id" => $data["sede_id"] ?? null,
             "id" => $data["id"]
         ]);
+$fechaColombia = date('Y-m-d H:i:s');
 
-        // Traer datos actualizados
+        // REGISTRAR ACTIVIDAD DE ACTUALIZACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
+        
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Actualizó el item '".$data["nombre"]."' en el inventario",
+            "tabla_afectada" => "inventario",
+            "registro_id" => $data["id"],
+            "fecha" => $fechaColombia
+        ]);
+
+        // Traer datos actualizados (parte existente)
         $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
         $stmt2->execute(["id" => $data["id"]]);
         $registro = $stmt2->fetch(PDO::FETCH_ASSOC);
@@ -64,7 +80,7 @@ try {
         ]);
 
     } else {
-        // CREAR INVENTARIO
+        // CREAR INVENTARIO - Parte existente
         $stmt = $pdo->prepare("INSERT INTO inventario 
             (codigo, nombre, dependencia, responsable, marca, modelo, serial, sede_id, creado_por)
             VALUES 
@@ -83,8 +99,23 @@ try {
         ]);
 
         $idInsertado = $pdo->lastInsertId();
+$fechaColombia = date('Y-m-d H:i:s');
 
-        // Traer datos insertados
+        // REGISTRAR ACTIVIDAD DE CREACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id,:fecha)");
+        
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Creó el item '".$data["nombre"]."' en el inventario",
+            "tabla_afectada" => "inventario",
+            "registro_id" => $idInsertado,
+            "fecha" => $fechaColombia
+        ]);
+
+        // Traer datos insertados (parte existente)
         $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
         $stmt2->execute(["id" => $idInsertado]);
         $registro = $stmt2->fetch(PDO::FETCH_ASSOC);

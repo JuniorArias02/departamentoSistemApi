@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET");
 header("Content-Type: application/json");

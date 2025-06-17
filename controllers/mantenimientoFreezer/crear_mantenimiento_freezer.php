@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 
@@ -9,14 +9,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../../database/conexion.php';
+date_default_timezone_set('America/Bogota');
 header("Content-Type: application/json");
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Validar campos obligatorios
 $camposObligatorios = [
-    "titulo", "codigo", "modelo", "dependencia",
-    "sede_id", "nombre_receptor", "creado_por", "imagen"
+    "titulo",
+    "codigo",
+    "modelo",
+    "dependencia",
+    "sede_id",
+    "nombre_receptor",
+    "creado_por",
+    "imagen"
 ];
 
 foreach ($camposObligatorios as $campo) {
@@ -98,6 +105,20 @@ try {
             "descripcion" => $data["descripcion"] ?? null,
             "id" => $data["id"]
         ]);
+       $fechaColombia = date('Y-m-d H:i:s');
+
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
+
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Actualizó el mantenimiento IPS '" . $data["titulo"] . "'",
+            "tabla_afectada" => "mantenimientos",
+            "registro_id" => $data["id"],
+            "fecha" => $fechaColombia
+        ]);
 
         echo json_encode(["msg" => "Mantenimiento de freezer actualizado con éxito"]);
     } else {
@@ -119,6 +140,26 @@ try {
             "descripcion" => $data["descripcion"] ?? null,
             "creado_por" => $data["creado_por"]
         ]);
+
+        $idInsertado = $pdo->lastInsertId();
+      $fechaColombia = date('Y-m-d H:i:s');
+
+
+
+        // REGISTRAR ACTIVIDAD DE CREACIÓN
+        $stmtAct = $pdo->prepare("INSERT INTO actividades 
+            (usuario_id, accion, tabla_afectada, registro_id, fecha)
+            VALUES 
+            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
+
+        $stmtAct->execute([
+            "usuario_id" => $data["creado_por"],
+            "accion" => "Creó el mantenimiento de IPS'" . $data["titulo"] . "'",
+            "tabla_afectada" => "mantenimientos",
+            "registro_id" => $idInsertado,
+            "fecha" => $fechaColombia
+        ]);
+
 
         echo json_encode([
             "msg" => "Mantenimiento de freezer registrado con éxito",
