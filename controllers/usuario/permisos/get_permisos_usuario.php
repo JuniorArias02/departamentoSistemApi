@@ -1,15 +1,7 @@
 <?php
 require_once '../../../database/conexion.php';
+require_once __DIR__ . '/../../../middlewares/headers_post.php';
 
-header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json");
-
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-  http_response_code(200);
-  exit();
-}
 
 // Obtener los datos del body
 $input = json_decode(file_get_contents("php://input"), true);

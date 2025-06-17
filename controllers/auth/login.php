@@ -1,10 +1,7 @@
 <?php
-header("Access-Control-Allow-Origin: https://formulario-medico.vercel.app"); 
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
-header("Content-Type: application/json");
-
 require_once '../../database/conexion.php';
+require_once __DIR__ . '/../../middlewares/headers_post.php';
+
 
 $data = json_decode(file_get_contents("php://input"), true);
 $usuario = $data['usuario'] ?? '';
