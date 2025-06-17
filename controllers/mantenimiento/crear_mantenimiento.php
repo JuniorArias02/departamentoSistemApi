@@ -49,7 +49,7 @@ if (!preg_match('/^data:image\/(png|jpg|jpeg|webp|gif);base64,/', $data['imagen'
 // Procesar imagen
 $extension = explode('/', explode(';', $data['imagen'])[0])[1];
 $nombreImagen = uniqid('img_') . '.' . $extension;
-$rutaRelativa = 'public/mantenimientosFreezer/' . $nombreImagen;
+$rutaRelativa = 'public/mantenimientos/' . $nombreImagen;
 $rutaGuardado = __DIR__ . '/../../' . $rutaRelativa;
 
 $imagenBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['imagen']);
@@ -66,7 +66,7 @@ $data['imagen'] = $rutaRelativa;
 
 try {
     if (!empty($data['id'])) {
-        $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos_freezer WHERE id = :id");
+        $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos WHERE id = :id");
         $stmtCheck->execute(["id" => $data["id"]]);
         $mantenimiento = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
@@ -76,7 +76,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("UPDATE mantenimientos_freezer SET 
+        $stmt = $pdo->prepare("UPDATE mantenimientos SET 
             titulo = :titulo,
             codigo = :codigo,
             modelo = :modelo,
@@ -113,9 +113,9 @@ try {
             "fecha" => $fechaColombia
         ]);
 
-        echo json_encode(["msg" => "Mantenimiento de freezer actualizado con éxito"]);
+        echo json_encode(["msg" => "Mantenimiento  actualizado con éxito"]);
     } else {
-        $stmt = $pdo->prepare("INSERT INTO mantenimientos_freezer 
+        $stmt = $pdo->prepare("INSERT INTO mantenimientos
             (titulo, codigo, modelo, dependencia, sede_id, nombre_receptor, 
              imagen, descripcion, creado_por, fecha_creacion) 
             VALUES 

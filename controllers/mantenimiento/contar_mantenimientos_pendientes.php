@@ -39,7 +39,7 @@ try {
 
     // Consulta para contar mantenimientos NO revisados (esta_revisado = 0)
     $sql = "SELECT COUNT(*) AS total_pendientes
-            FROM mantenimientos_freezer mf
+            FROM mantenimientos mf
             WHERE mf.esta_revisado = 0";
 
     // Filtros según el rol del usuario

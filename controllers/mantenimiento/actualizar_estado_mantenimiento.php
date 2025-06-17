@@ -28,7 +28,7 @@ try {
 
     // Actualizar el mantenimiento (sin fecha_ultima_actualizacion)
     $stmt = $pdo->prepare("
-        UPDATE mantenimientos_freezer 
+        UPDATE mantenimientos
         SET 
             esta_revisado = ?,
             revisado_por = ?,
@@ -61,7 +61,7 @@ try {
             mf.fecha_revisado,
             u.nombre_completo AS nombre_revisor
         FROM 
-            mantenimientos_freezer mf
+            mantenimientos mf
         LEFT JOIN 
             usuarios u ON mf.revisado_por = u.id
         WHERE 

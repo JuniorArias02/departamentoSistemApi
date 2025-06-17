@@ -22,7 +22,7 @@ if (!isset($data['id']) || !isset($data['usuario_id'])) {
 
 try {
     // Verificar que el mantenimiento existe y no está ya revisado
-    $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos_freezer WHERE id = :id");
+    $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos WHERE id = :id");
     $stmtCheck->execute(["id" => $data["id"]]);
     $mantenimiento = $stmtCheck->fetch(PDO::FETCH_ASSOC);
     
@@ -39,7 +39,7 @@ try {
     }
 
     // Marcar como revisado
-    $stmt = $pdo->prepare("UPDATE mantenimientos_freezer SET 
+    $stmt = $pdo->prepare("UPDATE mantenimientos SET 
         revisado_por = :usuario_id,
         fecha_revisado = NOW(),
         esta_revisado = TRUE

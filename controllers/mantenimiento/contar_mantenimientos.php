@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../middlewares/headers_get.php';
 
 try {
 
-    $sql = "SELECT COUNT(*) AS total FROM mantenimientos_freezer";
+    $sql = "SELECT COUNT(*) AS total FROM mantenimientos";
     $stmt = $pdo->query($sql);
     $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 

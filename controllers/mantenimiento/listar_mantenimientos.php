@@ -59,7 +59,7 @@ try {
                 mf.esta_revisado,
                 mf.fecha_ultima_actualizacion
             FROM 
-                mantenimientos_freezer mf
+                mantenimientos mf
             LEFT JOIN 
                 sedes s ON mf.sede_id = s.id
             LEFT JOIN 
