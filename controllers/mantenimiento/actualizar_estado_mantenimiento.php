@@ -76,7 +76,7 @@ try {
         'message' => 'Estado de mantenimiento actualizado correctamente',
         'data' => [
             'id' => $mantenimientoActualizado['id'],
-            'esta_revisado' => (bool)$mantenimientoActualizado['esta_revisado'], // Convertimos a booleano para el front
+            'esta_revisado' => (bool)$mantenimientoActualizado['esta_revisado'],
             'fecha_revisado' => $mantenimientoActualizado['fecha_revisado'],
             'revisado_por' => $estaRevisado ? $usuarioId : null,
             'nombre_revisor' => $estaRevisado ? $mantenimientoActualizado['nombre_revisor'] : null

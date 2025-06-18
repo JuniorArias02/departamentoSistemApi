@@ -1,5 +1,5 @@
 <?php
-require_once '../../../database/conexion.php';
+require_once __DIR__ . '/../../../database/conexion.php';
 require_once __DIR__ . '/../../../middlewares/headers_post.php';
 
 $input = json_decode(file_get_contents("php://input"), true);

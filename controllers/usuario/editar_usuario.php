@@ -5,11 +5,10 @@ require_once __DIR__ . '/../../middlewares/headers_post.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Validar campos obligatorios
-if (!isset($data['id_usuario_editor'], $data['id_usuario_objetivo'], $data['nombre_completo'], $data['usuario'], $data['rol_id'])) {
+if (!isset($data['id_usuario_editor'], $data['id_usuario_objetivo'], $data['nombre_completo'], $data['usuario'], $data['rol_id'], $data['estado'])) {
     echo json_encode(["success" => false, "message" => "Faltan datos requeridos."]);
     exit();
 }
-
 try {
     // Validar que editor es administrador
     $stmt = $pdo->prepare("SELECT r.nombre AS rol FROM usuarios u 
@@ -33,11 +32,12 @@ try {
     }
 
     // Construir query update
-    $sql = "UPDATE usuarios SET nombre_completo = :nombre, usuario = :usuario, rol_id = :rol_id";
+    $sql = "UPDATE usuarios SET nombre_completo = :nombre, usuario = :usuario, rol_id = :rol_id, estado = :estado";
     $params = [
         ':nombre' => $data['nombre_completo'],
         ':usuario' => $data['usuario'],
-        ':rol_id' => $data['rol_id']
+        ':rol_id' => $data['rol_id'],
+        ':estado' => $data['estado']
     ];
 
     // Si enviaron contraseña, hashearla y agregarla
@@ -58,5 +58,3 @@ try {
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
 }
-
-
