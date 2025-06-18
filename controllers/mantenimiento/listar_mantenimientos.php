@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../middlewares/headers_crud.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
-    
+
     if (!isset($data['usuario_id'])) {
         http_response_code(400);
         echo json_encode(["error" => "Se requiere el ID de usuario"]);
@@ -74,9 +74,9 @@ try {
     switch ($nombreRol) {
         case 'administrador':
         case 'gerencia':
-            // Ven todo sin filtros
+        case 'colaborador':
             break;
-            
+
         case 'coordinador':
             $sql .= " WHERE mf.nombre_receptor = ? OR mf.creado_por = ?";
             $params = [$usuarioId, $usuarioId];
@@ -85,7 +85,7 @@ try {
             http_response_code(403);
             echo json_encode(["error" => "No tienes permisos para ver estos registros"]);
             exit;
-            
+
         default:
             http_response_code(403);
             echo json_encode(["error" => "Rol no reconocido: " . $nombreRol]);
@@ -95,7 +95,7 @@ try {
     $sql .= " ORDER BY mf.fecha_creacion DESC";
 
     $stmt = $pdo->prepare($sql);
-    
+
     if (!empty($params)) {
         $stmt->execute($params);
     } else {
@@ -114,9 +114,8 @@ try {
         'success' => true,
         'data' => $mantenimientos,
         'count' => count($mantenimientos),
-        'rol_usuario' => $nombreRol 
+        'rol_usuario' => $nombreRol
     ]);
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([
