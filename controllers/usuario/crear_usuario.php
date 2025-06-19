@@ -1,12 +1,20 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Validar que venga el user_id para saber si es admin
 if (!isset($data['id_usuario_creador'], $data['nombre_completo'], $data['usuario'], $data['rol_id'], $data['estado'])) {
     echo json_encode(["success" => false, "message" => "Faltan datos requeridos."]);
+    exit();
+}
+
+if (!tienePermiso($pdo, $data['id_usuario_creador'], PERMISOS['AGREGAR_USUARIO'])) {
+    http_response_code(403);
+    echo json_encode(["success" => false, "message" => "Acceso denegado. No tienes permiso para crear usuarios."]);
     exit();
 }
 // Validar si el user_id tiene rol administrador
@@ -18,11 +26,6 @@ try {
                        WHERE u.id = ?");
     $stmt->execute([$data['id_usuario_creador']]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$usuario || $usuario['rol'] !== 'administrador') {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Acceso denegado. Solo administradores pueden crear usuarios."]);
-        exit();
-    }
 
     // Crear nuevo usuario
     $nombre = $data['nombre_completo'];

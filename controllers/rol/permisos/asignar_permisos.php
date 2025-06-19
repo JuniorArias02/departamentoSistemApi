@@ -1,14 +1,22 @@
 <?php
 require_once __DIR__ . '/../../../database/conexion.php';
 require_once __DIR__ . '/../../../middlewares/headers_post.php';
+require_once __DIR__ . '/./permisos.php';
+require_once __DIR__ . '/./validador_permisos.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
 // Validaciones
-if (!isset($data['rol_id']) || !isset($data['permisos'])) {
+if (!isset($data['rol_id']) || !isset($data['rol_id']) || !isset($data['permisos'])) {
     http_response_code(400);
     echo json_encode(["error" => "Datos incompletos"]);
     exit;
+}
+
+if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['ASIGNAR_PERMISO'])) {
+    http_response_code(403);
+    echo json_encode(["success" => false, "message" => "Acceso denegado. No tienes permiso para crear usuarios."]);
+    exit();
 }
 
 try {
