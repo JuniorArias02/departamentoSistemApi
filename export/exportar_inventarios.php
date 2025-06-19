@@ -2,25 +2,52 @@
 require_once '../vendor/autoload.php';
 require_once '../database/conexion.php';
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://departamento-sistemasips.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET");
-header("Content-Type: application/json");
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
+// Encabezados completos sin ID
 $headers = [
-    "ID", "Codigo", "Nombre", "Dependencia", "Responsable",
-    "Marca", "Modelo", "Serial", "Sede", "Creado Por", "Fecha Creacion"
+    "Código",
+    "Código de Barras",
+    "Nombre",
+    "Grupo",
+    "Vida Útil",
+    "Vida Útil NIIF",
+    "Dependencia",
+    "Responsable",
+    "Centro de Costo",
+    "Ubicación",
+    "Proveedor",
+    "Fecha Compra",
+    "Soporte",
+    "Descripción",
+    "Estado",
+    "Marca",
+    "Modelo",
+    "Serial",
+    "Escritura",
+    "Matrícula",
+    "Valor Compra",
+    "Salvamento",
+    "Depreciación",
+    "Depreciación NIIF",
+    "Meses Depreciación",
+    "Meses Dep. NIIF",
+    "Tipo Adquisición",
+    "Fecha Calibrado"
 ];
-
 // Estilo para encabezados
 $col = 'A';
 foreach ($headers as $header) {
@@ -34,33 +61,97 @@ foreach ($headers as $header) {
     $col++;
 }
 
-// Consulta del inventario con el nombre de la sede
-$sql = "SELECT i.id, i.codigo, i.nombre, i.dependencia, i.responsable,
-               i.marca, i.modelo, i.serial, s.nombre AS sede,
-               i.creado_por, i.fecha_creacion
-        FROM inventario i
-        LEFT JOIN sedes s ON i.sede_id = s.id";
+// Consulta completa del inventario (excepto ID)
+$sql = "SELECT 
+    i.codigo, i.codigo_barras, i.nombre, i.grupo, i.vida_util, i.vida_util_niff,
+    i.dependencia, i.responsable, i.centro_costo, i.ubicacion, i.proveedor, i.fecha_compra,
+    i.soporte, i.descripcion, i.estado, i.marca, i.modelo, i.serial,
+    i.escritura, i.matricula, i.valor_compra, i.salvamenta, i.depreciacion,
+    i.depreciacion_niif, i.meses, i.meses_niif, i.tipo_adquisicion, i.calibrado
+FROM inventario i";
 $stmt = $pdo->query($sql);
+
+// Función para formatear fechas
+function formatDate($date)
+{
+    if (!$date) return '';
+    return date('d/m/Y', strtotime($date));
+}
+
+// Función para formatear valores monetarios
+function formatCurrency($value)
+{
+    if ($value === null) return '';
+    return number_format($value, 2, ',', '.');
+}
 
 $rowNum = 2;
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $col = 'A';
-    foreach ($row as $value) {
-        $sheet->setCellValue($col . $rowNum, $value);
-        $col++;
-    }
+
+    $sheet->setCellValue($col++ . $rowNum, $row['codigo']);
+    $sheet->setCellValue($col++ . $rowNum, $row['codigo_barras']);
+    $sheet->setCellValue($col++ . $rowNum, $row['nombre']);
+    $sheet->setCellValue($col++ . $rowNum, $row['grupo']);
+    $sheet->setCellValue($col++ . $rowNum, formatDate($row['vida_util']));
+    $sheet->setCellValue($col++ . $rowNum, formatDate($row['vida_util_niff']));
+    $sheet->setCellValue($col++ . $rowNum, $row['dependencia']);
+    $sheet->setCellValue($col++ . $rowNum, $row['responsable']);
+    $sheet->setCellValue($col++ . $rowNum, $row['centro_costo']);
+    $sheet->setCellValue($col++ . $rowNum, $row['ubicacion']);
+    $sheet->setCellValue($col++ . $rowNum, $row['proveedor']);
+    $sheet->setCellValue($col++ . $rowNum, formatDate($row['fecha_compra']));
+    $sheet->setCellValue($col++ . $rowNum, $row['soporte']);
+    $sheet->setCellValue($col++ . $rowNum, $row['descripcion']);
+    $sheet->setCellValue($col++ . $rowNum, $row['estado']);
+    $sheet->setCellValue($col++ . $rowNum, $row['marca']);
+    $sheet->setCellValue($col++ . $rowNum, $row['modelo']);
+    $sheet->setCellValue($col++ . $rowNum, $row['serial']);
+    $sheet->setCellValue($col++ . $rowNum, $row['escritura']);
+    $sheet->setCellValue($col++ . $rowNum, $row['matricula']);
+    $sheet->setCellValue($col++ . $rowNum, formatCurrency($row['valor_compra']));
+    $sheet->setCellValue($col++ . $rowNum, $row['salvamenta']);
+    $sheet->setCellValue($col++ . $rowNum, formatCurrency($row['depreciacion']));
+    $sheet->setCellValue($col++ . $rowNum, formatCurrency($row['depreciacion_niif']));
+    $sheet->setCellValue($col++ . $rowNum, $row['meses']);
+    $sheet->setCellValue($col++ . $rowNum, $row['meses_niif']);
+    $sheet->setCellValue($col++ . $rowNum, $row['tipo_adquisicion']);
+    $sheet->setCellValue($col++ . $rowNum, formatDate($row['calibrado']));
+
+    // Información de creación
+    $sheet->setCellValue($col++ . $rowNum, $row['creado_por']);
+    $sheet->setCellValue($col++ . $rowNum, formatDate($row['fecha_creacion']));
+
     $rowNum++;
 }
 
+// Aplicar formatos especiales a columnas
+$sheet->getStyle('K2:K' . $rowNum)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+$sheet->getStyle('L2:L' . $rowNum)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+$sheet->getStyle('P2:P' . $rowNum)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+$sheet->getStyle('V2:X' . $rowNum)->getNumberFormat()->setFormatCode('#,##0.00');
+$sheet->getStyle('AC2:AC' . $rowNum)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+$sheet->getStyle('AF2:AF' . $rowNum)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+
 // Auto ajustar columnas
-$maxCol = chr(ord('A') + count($headers) - 1);
-for ($c = 'A'; $c <= $maxCol; $c++) {
-    $sheet->getColumnDimension($c)->setAutoSize(true);
+
+
+$colCount = count($headers);
+$lastColLetter = Coordinate::stringFromColumnIndex($colCount); // ← última letra válida
+
+// Autoajustar ancho de columnas
+for ($i = 1; $i <= $colCount; $i++) {
+    $colLetter = Coordinate::stringFromColumnIndex($i);
+    $sheet->getColumnDimension($colLetter)->setAutoSize(true);
 }
+
+// Configurar hoja para mejor visualización
+$sheet->setAutoFilter("A1:{$lastColLetter}1");
+$sheet->freezePane('A2');
 
 // Forzar descarga
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="inventario.xlsx"');
+header('Content-Disposition: attachment;filename="inventario_completo.xlsx"');
 header('Cache-Control: max-age=0');
 
 $writer = new Xlsx($spreadsheet);

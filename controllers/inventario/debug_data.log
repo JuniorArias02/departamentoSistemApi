@@ -1,0 +1,35 @@
+Array
+(
+    [id] => 437
+    [codigo] => ME1025
+    [nombre] => SILLA DE RODACHINES NEGRA
+    [dependencia] => OFICINA ADMINISTRATIVA_JEFE MAITE
+    [responsable] => N/AEEEE
+    [marca] => N/A
+    [modelo] => N/A
+    [serial] => N/A
+    [sede_id] => 3
+    [codigo_barras] => 
+    [grupo] => 
+    [vida_util] => 
+    [vida_util_niff] => 
+    [centro_costo] => 
+    [ubicacion] => 
+    [proveedor] => 
+    [fecha_compra] => 
+    [soporte] => 
+    [descripcion] => 
+    [estado] => 
+    [escritura] => 
+    [matricula] => 
+    [valor_compra] => 
+    [salvamenta] => 
+    [depreciacion] => 
+    [depreciacion_niif] => 
+    [meses] => 
+    [meses_niif] => 
+    [tipo_adquisicion] => 
+    [calibrado] => 
+    [observaciones] => 
+    [creado_por] => 8
+)
