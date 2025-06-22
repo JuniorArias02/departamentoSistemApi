@@ -1,7 +1,7 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_delete.php';
-
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -16,6 +16,15 @@ if (!isset($data['usuario_id']) || !is_numeric($data['usuario_id'])) {
     http_response_code(400);
     echo json_encode(["error" => "Se requiere el ID del usuario que realiza la acción."]);
     exit;
+}
+
+if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['MANTENIMIENTOS']['ELIMINAR'])) {
+    http_response_code(403);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+    ]);
+    exit();
 }
 
 try {
@@ -49,9 +58,9 @@ try {
         (usuario_id, accion, tabla_afectada, registro_id, fecha)
         VALUES 
         (:usuario_id, :accion, 'inventario', :registro_id, NOW())");
-    
-    $accion = "Eliminó el item '".$item['nombre']."' del inventario";
-    
+
+    $accion = "Eliminó el item '" . $item['nombre'] . "' del inventario";
+
     $stmtActividad->execute([
         "usuario_id" => $data['usuario_id'],
         "accion" => $accion,
@@ -65,7 +74,6 @@ try {
         "msg" => "Inventario eliminado correctamente",
         "actividad_registrada" => true
     ]);
-
 } catch (PDOException $e) {
     $pdo->rollBack();
     http_response_code(500);

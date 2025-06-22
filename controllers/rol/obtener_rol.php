@@ -3,9 +3,9 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_getPost.php';
 
 // Consulta para obtener todos los permisos
-$sql = "SELECT id, nombre FROM rol ORDER BY nombre";
 
 try {
+	$sql = "SELECT id, nombre FROM rol ORDER BY nombre";
 	$stmt = $pdo->query($sql);
 	$permisos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

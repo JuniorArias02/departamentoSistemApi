@@ -1,6 +1,7 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -9,6 +10,17 @@ if (!isset($data['id_usuario_editor'], $data['id_usuario_objetivo'], $data['nomb
     echo json_encode(["success" => false, "message" => "Faltan datos requeridos."]);
     exit();
 }
+
+if (!tienePermiso($pdo, $data['id_usuario_editor'], PERMISOS['USUARIOS']['EDITAR'])) {
+    http_response_code(403);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acceso denegado. No tienes permiso para crear usuarios."
+    ]);
+    exit();
+}
+
+
 try {
     // Validar que editor es administrador
     $stmt = $pdo->prepare("SELECT r.nombre AS rol FROM usuarios u 

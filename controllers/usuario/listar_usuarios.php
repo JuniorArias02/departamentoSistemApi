@@ -13,11 +13,15 @@ if (!isset($data['user_id'])) {
     exit();
 }
 
-if (!tienePermiso($pdo, $data['user_id'], PERMISOS['VER_DATOS_USUARIOS'])) {
+if (!tienePermiso($pdo, $data['id_usuario_creador'], PERMISOS['USUARIOS']['VER_DATOS'])) {
     http_response_code(403);
-    echo json_encode(["success" => false, "message" => "Acceso denegado. No tienes permiso para crear usuarios."]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acceso denegado. No tienes permiso para crear usuarios."
+    ]);
     exit();
 }
+
 
 try {
     // Traer todos los usuarios con su rol por nombre

@@ -12,12 +12,14 @@ if (!isset($data['id_usuario_creador'], $data['nombre_completo'], $data['usuario
     exit();
 }
 
-if (!tienePermiso($pdo, $data['id_usuario_creador'], PERMISOS['AGREGAR_USUARIO'])) {
+if (!tienePermiso($pdo, $data['id_usuario_creador'], PERMISOS['USUARIOS']['CREAR'])) {
     http_response_code(403);
-    echo json_encode(["success" => false, "message" => "Acceso denegado. No tienes permiso para crear usuarios."]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acceso denegado. No tienes permiso para crear usuarios."
+    ]);
     exit();
 }
-// Validar si el user_id tiene rol administrador
 
 try {
 

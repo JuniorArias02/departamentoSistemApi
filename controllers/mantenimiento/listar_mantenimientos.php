@@ -1,7 +1,7 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_crud.php';
-
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -10,6 +10,15 @@ try {
         http_response_code(400);
         echo json_encode(["error" => "Se requiere el ID de usuario"]);
         exit;
+    }
+
+    if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['MANTENIMIENTOS']['VER_DATOS'])) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+        ]);
+        exit();
     }
 
     $usuarioId = filter_var($data['usuario_id'], FILTER_VALIDATE_INT);

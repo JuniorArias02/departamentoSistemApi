@@ -13,12 +13,14 @@ if (!isset($data['rol_id']) || !isset($data['rol_id']) || !isset($data['permisos
     exit;
 }
 
-if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['ASIGNAR_PERMISO'])) {
+if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['GESTION_PERMISOS']['ASIGNAR'])) {
     http_response_code(403);
-    echo json_encode(["success" => false, "message" => "Acceso denegado. No tienes permiso para crear usuarios."]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+    ]);
     exit();
 }
-
 try {
     $pdo->beginTransaction();
 
