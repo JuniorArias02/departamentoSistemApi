@@ -1,7 +1,8 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
-
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -28,7 +29,7 @@ foreach ($camposObligatorios as $campo) {
 
     if ($campo === "imagen" && trim($data[$campo]) === "") {
         http_response_code(400);
-        echo json_encode(["error" => "Debe subir una imagen del freezer."]);
+        echo json_encode(["error" => "Debe subir una imagen del mantenimiento."]);
         exit;
     }
 
@@ -38,6 +39,7 @@ foreach ($camposObligatorios as $campo) {
         exit;
     }
 }
+
 
 // Validar que la imagen sea base64 y de tipo imagen
 if (!preg_match('/^data:image\/(png|jpg|jpeg|webp|gif);base64,/', $data['imagen'])) {
@@ -87,6 +89,17 @@ try {
             descripcion = :descripcion
             WHERE id = :id");
 
+
+        if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['MANTENIMIENTOS']['EDITAR'])) {
+            http_response_code(403);
+            echo json_encode([
+                "success" => false,
+                "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+            ]);
+            exit();
+        }
+
+
         $stmt->execute([
             "titulo" => $data["titulo"],
             "codigo" => $data["codigo"],
@@ -98,7 +111,7 @@ try {
             "descripcion" => $data["descripcion"] ?? null,
             "id" => $data["id"]
         ]);
-       $fechaColombia = date('Y-m-d H:i:s');
+        $fechaColombia = date('Y-m-d H:i:s');
 
         $stmtAct = $pdo->prepare("INSERT INTO actividades 
             (usuario_id, accion, tabla_afectada, registro_id, fecha)
@@ -135,7 +148,7 @@ try {
         ]);
 
         $idInsertado = $pdo->lastInsertId();
-      $fechaColombia = date('Y-m-d H:i:s');
+        $fechaColombia = date('Y-m-d H:i:s');
 
 
 
@@ -144,6 +157,15 @@ try {
             (usuario_id, accion, tabla_afectada, registro_id, fecha)
             VALUES 
             (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
+
+        if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['MANTENIMIENTOS']['CREAR'])) {
+            http_response_code(403);
+            echo json_encode([
+                "success" => false,
+                "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+            ]);
+            exit();
+        }
 
         $stmtAct->execute([
             "usuario_id" => $data["creado_por"],

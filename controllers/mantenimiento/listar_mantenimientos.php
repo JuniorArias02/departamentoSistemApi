@@ -1,7 +1,8 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_crud.php';
-
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -19,23 +20,18 @@ try {
         exit;
     }
 
-    // Obtener el NOMBRE DEL ROL (texto) en lugar del ID
-    $stmtRol = $pdo->prepare("
-        SELECT r.nombre AS nombre_rol 
-        FROM usuarios u
-        JOIN rol r ON u.rol_id = r.id
-        WHERE u.id = ?
-    ");
-    $stmtRol->execute([$usuarioId]);
-    $usuario = $stmtRol->fetch(PDO::FETCH_ASSOC);
+    // Verificar si puede ver TODOS los registros o solo los propios
+    $puedeVerTodos = tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_TODOS']);
+    $puedeVerPropios = tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_PROPIOS']);
 
-    if (!$usuario) {
-        http_response_code(404);
-        echo json_encode(["error" => "Usuario no encontrado"]);
-        exit;
+    if (!$puedeVerTodos && !$puedeVerPropios) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "message" => "Acceso denegado. No tienes permiso para ver los mantenimientos."
+        ]);
+        exit();
     }
-
-    $nombreRol = $usuario['nombre_rol'];
 
     // Consulta base
     $sql = "SELECT 
@@ -69,38 +65,17 @@ try {
             LEFT JOIN 
                 usuarios uc ON mf.creado_por = uc.id";
 
-    // Filtros por NOMBRE DE ROL (texto)
     $params = [];
-    switch ($nombreRol) {
-        case 'administrador':
-        case 'gerencia':
-        case 'colaborador':
-            break;
 
-        case 'coordinador':
-            $sql .= " WHERE mf.nombre_receptor = ? OR mf.creado_por = ?";
-            $params = [$usuarioId, $usuarioId];
-            break;
-        case 'Invitado':
-            http_response_code(403);
-            echo json_encode(["error" => "No tienes permisos para ver estos registros"]);
-            exit;
-
-        default:
-            http_response_code(403);
-            echo json_encode(["error" => "Rol no reconocido: " . $nombreRol]);
-            exit;
+    if (!$puedeVerTodos && $puedeVerPropios) {
+        $sql .= " WHERE mf.nombre_receptor = ? OR mf.creado_por = ?";
+        $params = [$usuarioId, $usuarioId];
     }
 
     $sql .= " ORDER BY mf.fecha_creacion DESC";
 
     $stmt = $pdo->prepare($sql);
-
-    if (!empty($params)) {
-        $stmt->execute($params);
-    } else {
-        $stmt->execute();
-    }
+    $stmt->execute($params);
 
     $mantenimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -114,7 +89,7 @@ try {
         'success' => true,
         'data' => $mantenimientos,
         'count' => count($mantenimientos),
-        'rol_usuario' => $nombreRol
+        'permiso' => $puedeVerTodos ? 'todos' : 'propios'
     ]);
 } catch (PDOException $e) {
     http_response_code(500);

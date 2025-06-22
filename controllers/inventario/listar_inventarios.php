@@ -1,6 +1,17 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_get.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
+
+if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['VER_DATOS'])) {
+	http_response_code(403);
+	echo json_encode([
+		"success" => false,
+		"message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+	]);
+	exit();
+}
 
 try {
 	$sql = "SELECT i.*, s.nombre AS sede_nombre

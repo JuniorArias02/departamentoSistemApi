@@ -1,22 +1,31 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_crud.php';
-
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
-    
+
     // Validar datos de entrada
     if (!isset($data['id']) || !isset($data['usuario_id']) || !isset($data['esta_revisado'])) {
         http_response_code(400);
         echo json_encode(["error" => "Se requieren: ID del mantenimiento, ID del usuario y estado de revisión"]);
         exit;
     }
+    if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['MANTENIMIENTOS']['MARCAR_REVISADO'])) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "message" => "Acceso denegado. No tienes permiso para ELIMINAR inventario."
+        ]);
+        exit();
+    }
 
     $mantenimientoId = filter_var($data['id'], FILTER_VALIDATE_INT);
     $usuarioId = filter_var($data['usuario_id'], FILTER_VALIDATE_INT);
     $estaRevisado = filter_var($data['esta_revisado'], FILTER_VALIDATE_INT);
-    
+
     if ($mantenimientoId === false || $usuarioId === false || ($estaRevisado !== 0 && $estaRevisado !== 1)) {
         http_response_code(400);
         echo json_encode(["error" => "Datos inválidos. Estado debe ser 0 o 1"]);
@@ -82,7 +91,6 @@ try {
             'nombre_revisor' => $estaRevisado ? $mantenimientoActualizado['nombre_revisor'] : null
         ]
     ]);
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

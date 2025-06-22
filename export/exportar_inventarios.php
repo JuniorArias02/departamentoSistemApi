@@ -2,7 +2,7 @@
 require_once '../vendor/autoload.php';
 require_once '../database/conexion.php';
 
-header("Access-Control-Allow-Origin: https://departamento-sistemasips.vercel.app");
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET");
 
@@ -63,12 +63,14 @@ foreach ($headers as $header) {
 
 // Consulta completa del inventario (excepto ID)
 $sql = "SELECT 
-    i.codigo, i.codigo_barras, i.nombre, i.grupo, i.vida_util, i.vida_util_niff,
-    i.dependencia, i.responsable, i.centro_costo, i.ubicacion, i.proveedor, i.fecha_compra,
-    i.soporte, i.descripcion, i.estado, i.marca, i.modelo, i.serial,
-    i.escritura, i.matricula, i.valor_compra, i.salvamenta, i.depreciacion,
-    i.depreciacion_niif, i.meses, i.meses_niif, i.tipo_adquisicion, i.calibrado
+  i.codigo, i.codigo_barras, i.nombre, i.grupo, i.vida_util, i.vida_util_niff,
+  i.dependencia, i.responsable, i.centro_costo, i.ubicacion, i.proveedor, i.fecha_compra,
+  i.soporte, i.descripcion, i.estado, i.marca, i.modelo, i.serial,
+  i.escritura, i.matricula, i.valor_compra, i.salvamenta, i.depreciacion,
+  i.depreciacion_niif, i.meses, i.meses_niif, i.tipo_adquisicion, i.calibrado,
+  i.creado_por, i.fecha_creacion
 FROM inventario i";
+
 $stmt = $pdo->query($sql);
 
 // Función para formatear fechas
@@ -119,9 +121,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $sheet->setCellValue($col++ . $rowNum, formatDate($row['calibrado']));
 
     // Información de creación
-    $sheet->setCellValue($col++ . $rowNum, $row['creado_por']);
-    $sheet->setCellValue($col++ . $rowNum, formatDate($row['fecha_creacion']));
-
     $rowNum++;
 }
 

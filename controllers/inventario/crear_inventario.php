@@ -1,6 +1,8 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -30,6 +32,8 @@ function limpiarNumero($valor)
     $valor = str_replace(',', '.', $valor);
     return is_numeric($valor) ? $valor : null;
 }
+
+
 
 try {
     $fechaColombia = date('Y-m-d H:i:s');
@@ -70,6 +74,15 @@ try {
             fecha_actualizacion = NOW()
             WHERE id = :id");
 
+        if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['EDITAR'])) {
+            http_response_code(403);
+            echo json_encode([
+                "success" => false,
+                "message" => "Acceso denegado. No tienes permiso para editar inventario."
+            ]);
+            exit();
+        }
+
         $stmt->execute([
             "codigo" => $data["codigo"],
             "nombre" => $data["nombre"],
@@ -104,6 +117,10 @@ try {
             "id" => $data["id"]
         ]);
 
+
+        $fechaColombia = date('Y-m-d H:i:s');
+
+
         // REGISTRAR ACTIVIDAD DE ACTUALIZACIÓN
         $stmtAct = $pdo->prepare("INSERT INTO actividades 
             (usuario_id, accion, tabla_afectada, registro_id, fecha)
@@ -116,6 +133,16 @@ try {
             "tabla_afectada" => "inventario",
             "registro_id" => $data["id"],
             "fecha" => $fechaColombia
+        ]);
+
+        // Traer datos actualizados (parte existente)
+        $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
+        $stmt2->execute(["id" => $data["id"]]);
+        $registro = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            "msg" => "Inventario actualizado con éxito",
+            "data" => $registro
         ]);
     } else {
         // CREAR NUEVO INVENTARIO
@@ -132,8 +159,19 @@ try {
              :salvamenta, :depreciacion, :depreciacion_niif, :meses, :meses_niif, :tipo_adquisicion,
              :calibrado, :observaciones)");
 
+
         $valorCompra = str_replace(',', '.', $data["valor_compra"]);
         $depreciacion = str_replace(',', '.', $data["depreciacion"]);
+
+        if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['CREAR'])) {
+            http_response_code(403);
+            echo json_encode([
+                "success" => false,
+                "message" => "Acceso denegado. No tienes permiso para crear inventario."
+            ]);
+            exit();
+        }
+
         $stmt->execute([
             "codigo" => $data["codigo"],
             "nombre" => $data["nombre"],
@@ -173,11 +211,14 @@ try {
         }
 
         $idInsertado = $pdo->lastInsertId();
+        $fechaColombia = date('Y-m-d H:i:s');
+
 
         // REGISTRAR ACTIVIDAD DE CREACIÓN
         $stmtAct = $pdo->prepare("INSERT INTO actividades 
             (usuario_id, accion, tabla_afectada, registro_id, fecha)
             VALUES 
+
             (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
 
         $stmtAct->execute([
