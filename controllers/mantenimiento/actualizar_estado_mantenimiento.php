@@ -3,6 +3,7 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_crud.php';
 require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
+require_once __DIR__ . '/../utils/registrar_actividad.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -61,6 +62,18 @@ try {
         ]);
         exit;
     }
+
+    $accion = $estaRevisado
+        ? "Marcó como revisado el mantenimiento ID {$mantenimientoId}"
+        : "Marcó como no revisado el mantenimiento ID {$mantenimientoId}";
+
+    registrarActividad(
+        $pdo,
+        $usuarioId,
+        $accion,
+        "mantenimientos",
+        $mantenimientoId
+    );
 
     // Obtener datos actualizados
     $stmtMantenimiento = $pdo->prepare("

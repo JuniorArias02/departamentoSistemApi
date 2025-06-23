@@ -37,8 +37,10 @@ const PERMISOS = [
         'CREAR' => 'crear_mantenimiento',
         'EDITAR' => 'editar_mantenimiento',
         'ELIMINAR' => 'eliminar_mantenimiento',
-        'VER_TODOS' => 'ver_todos_mantenimientos', // 🔓 acceso total
-        'VER_PROPIOS' => 'ver_propios_mantenimientos' // 🔒 acceso limitado
+        'VER_TODOS' => 'ver_todos_mantenimientos',
+        'VER_PROPIOS' => 'ver_propios_mantenimientos',
+        'CONTAR_TODOS_PENDIENTES' => 'contar_todos_pendientes_mantenimientos',
+        'CONTAR_PROPIOS_PENDIENTES' => 'contar_propios_pendientes_mantenimientos',
     ],
 
     // GESTIÓN DE PERMISOS
@@ -56,5 +58,13 @@ const PERMISOS = [
         'EDITAR' => 'editar_inventario',
         'ELIMINAR' => 'eliminar_inventario',
         'EXPORTAR' => 'exportar_inventario',
+    ],
+
+
+    'ADMINISTRADOR_WEB' => [
+        'CREAR_AVISO_ACTUALIZACION' => 'crear_aviso_actualizacion_web',
+        'EDITAR_AVISO_ACTUALIZACION' => 'editar_aviso_actualizacion_web',
+        'ELIMINAR_AVISO_ACTUALIZACION' => 'eliminar_aviso_actualizacion_web',
+        'VER_AVISOS' => 'ver_avisos_actualizacion_web',
     ],
 ];

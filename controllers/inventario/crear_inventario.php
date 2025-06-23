@@ -3,6 +3,7 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
+require_once __DIR__ . '/../utils/registrar_actividad.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -122,18 +123,13 @@ try {
 
 
         // REGISTRAR ACTIVIDAD DE ACTUALIZACIÓN
-        $stmtAct = $pdo->prepare("INSERT INTO actividades 
-            (usuario_id, accion, tabla_afectada, registro_id, fecha)
-            VALUES 
-            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
-
-        $stmtAct->execute([
-            "usuario_id" => $data["creado_por"],
-            "accion" => "Actualizó el item '" . $data["nombre"] . "' en el inventario",
-            "tabla_afectada" => "inventario",
-            "registro_id" => $data["id"],
-            "fecha" => $fechaColombia
-        ]);
+        registrarActividad(
+            $pdo,
+            $data['creado_por'],
+            "Actualizo el inventario con código {$data['codigo']}",
+            "inventario",
+            $data['id']
+        );
 
         // Traer datos actualizados (parte existente)
         $stmt2 = $pdo->prepare("SELECT * FROM inventario WHERE id = :id");
@@ -215,19 +211,13 @@ try {
 
 
         // REGISTRAR ACTIVIDAD DE CREACIÓN
-        $stmtAct = $pdo->prepare("INSERT INTO actividades 
-            (usuario_id, accion, tabla_afectada, registro_id, fecha)
-            VALUES 
-
-            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
-
-        $stmtAct->execute([
-            "usuario_id" => $data["creado_por"],
-            "accion" => "Creó el item '" . $data["nombre"] . "' en el inventario",
-            "tabla_afectada" => "inventario",
-            "registro_id" => $idInsertado,
-            "fecha" => $fechaColombia
-        ]);
+        registrarActividad(
+            $pdo,
+            $data['creado_por'],
+            "Creó el inventario con código {$data['codigo']}",
+            "inventario",
+            $data['id']
+        );
     }
 
     // Traer datos actualizados/insertados

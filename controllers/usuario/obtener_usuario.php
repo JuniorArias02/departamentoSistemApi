@@ -1,9 +1,12 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 // Leer JSON enviado en el body
 $input = json_decode(file_get_contents('php://input'), true);
+
 
 if (!isset($input['id_usuario_editor'], $input['id_usuario_objetivo'])) {
     echo json_encode(["success" => false, "message" => "Faltan parámetros"]);
@@ -21,11 +24,15 @@ try {
     $stmt->execute([$id_editor]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$usuario || $usuario['rol'] !== 'administrador') {
+    if (!tienePermiso($pdo, $input['id_usuario_editor'], PERMISOS['USUARIOS']['EDITAR'])) {
         http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Solo admins pueden ver usuarios."]);
+        echo json_encode([
+            "success" => false,
+            "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
+        ]);
         exit();
     }
+
 
     // Obtener usuario a editar
     $stmt = $pdo->prepare("SELECT id, nombre_completo, usuario, rol_id FROM usuarios WHERE id = ?");
@@ -37,8 +44,6 @@ try {
     } else {
         echo json_encode(["success" => false, "message" => "Usuario no encontrado"]);
     }
-
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
 }
-

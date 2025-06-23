@@ -1,7 +1,8 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_crud.php';
-
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -19,70 +20,32 @@ try {
         exit;
     }
 
-    // Obtener el rol del usuario
-    $stmtRol = $pdo->prepare("
-        SELECT r.nombre AS nombre_rol 
-        FROM usuarios u
-        JOIN rol r ON u.rol_id = r.id
-        WHERE u.id = ?
-    ");
-    $stmtRol->execute([$usuarioId]);
-    $usuario = $stmtRol->fetch(PDO::FETCH_ASSOC);
-
-    if (!$usuario) {
-        http_response_code(404);
-        echo json_encode(["error" => "Usuario no encontrado"]);
-        exit;
-    }
-
-    $nombreRol = $usuario['nombre_rol'];
-
-    // Consulta para contar mantenimientos NO revisados (esta_revisado = 0)
     $sql = "SELECT COUNT(*) AS total_pendientes
             FROM mantenimientos mf
             WHERE mf.esta_revisado = 0";
-
-    // Filtros según el rol del usuario
     $params = [];
-    switch ($nombreRol) {
-        case 'administrador':
-        case 'gerencia':
-        case 'colaborador':
-            break;
 
-        case 'coordinador':
-            // Solo ven los que ellos crearon o les asignaron
-            $sql .= " AND (mf.creado_por = ? OR mf.nombre_receptor = ?)";
-            $params = [$usuarioId, $usuarioId];
-            break;
-
-        case 'Invitado':
-            http_response_code(403);
-            echo json_encode(["error" => "No tienes permisos para ver estas notificaciones"]);
-            exit;
-
-        default:
-            http_response_code(403);
-            echo json_encode(["error" => "Rol no reconocido: " . $nombreRol]);
-            exit;
+    // Verificar permisos para contar pendientes
+    if (tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['CONTAR_TODOS_PENDIENTES'])) {
+        // No modificamos nada, ya ve todos
+    } elseif (tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['CONTAR_PROPIOS_PENDIENTES'])) {
+        $sql .= " AND (mf.creado_por = ? OR mf.nombre_receptor = ?)";
+        $params = [$usuarioId, $usuarioId];
+    } else {
+        http_response_code(403);
+        echo json_encode(["error" => "No tienes permiso para ver mantenimientos pendientes"]);
+        exit;
     }
 
     $stmt = $pdo->prepare($sql);
-
-    if (!empty($params)) {
-        $stmt->execute($params);
-    } else {
-        $stmt->execute();
-    }
-
+    $stmt->execute($params);
     $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
     $totalPendientes = (int)$resultado['total_pendientes'];
 
     http_response_code(200);
     echo json_encode([
         'success' => true,
-        'total_pendientes' => $totalPendientes,
-        'rol_usuario' => $nombreRol
+        'total_pendientes' => $totalPendientes
     ]);
 } catch (PDOException $e) {
     http_response_code(500);

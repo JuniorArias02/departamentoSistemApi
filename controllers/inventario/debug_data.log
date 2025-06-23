@@ -1,13 +1,13 @@
 Array
 (
-    [id] => 437
-    [codigo] => ME1025
-    [nombre] => SILLA DE RODACHINES NEGRA
-    [dependencia] => OFICINA ADMINISTRATIVA_JEFE MAITE
-    [responsable] => N/AEEEE
-    [marca] => N/A
-    [modelo] => N/A
-    [serial] => N/A
+    [id] => 1270
+    [codigo] => WRGQAWARGWRG
+    [nombre] => GWRG
+    [dependencia] => GRG
+    [responsable] => 
+    [marca] => 
+    [modelo] => 
+    [serial] => 
     [sede_id] => 3
     [codigo_barras] => 
     [grupo] => 

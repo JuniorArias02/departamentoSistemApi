@@ -1,9 +1,23 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_get.php';
+require_once __DIR__ . '/../../middlewares/headers_post.php'; // <- usamos headers POST
 require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
+// Leer JSON del body
+$data = json_decode(file_get_contents("php://input"), true);
+
+// Verifica que venga el ID del usuario
+if (!isset($data['creado_por'])) {
+	http_response_code(400);
+	echo json_encode([
+		"success" => false,
+		"message" => "Falta el campo 'creado_por'."
+	]);
+	exit();
+}
+
+// Validar permisos
 if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['VER_DATOS'])) {
 	http_response_code(403);
 	echo json_encode([

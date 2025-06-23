@@ -23,19 +23,6 @@ if (!tienePermiso($pdo, $data['id_usuario_editor'], PERMISOS['USUARIOS']['EDITAR
 
 
 try {
-    // Validar que editor es administrador
-    $stmt = $pdo->prepare("SELECT r.nombre AS rol FROM usuarios u 
-                           JOIN rol r ON u.rol_id = r.id 
-                           WHERE u.id = ?");
-    $stmt->execute([$data['id_usuario_editor']]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$usuario || $usuario['rol'] !== 'administrador') {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Acceso denegado. Solo administradores pueden editar usuarios."]);
-        exit();
-    }
-
     // Validar que el usuario a editar existe
     $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
     $stmt->execute([$data['id_usuario_objetivo']]);

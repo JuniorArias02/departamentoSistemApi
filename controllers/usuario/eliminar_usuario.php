@@ -7,9 +7,11 @@ require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data['id_usuario_editor'], $data['id_usuario_objetivo'])) {
+    http_response_code(400); 
     echo json_encode(["success" => false, "message" => "Faltan datos requeridos."]);
     exit();
 }
+
 
 if (!tienePermiso($pdo, $data['id_usuario_editor'], PERMISOS['USUARIOS']['ELIMINAR'])) {
     http_response_code(403);
@@ -22,20 +24,6 @@ if (!tienePermiso($pdo, $data['id_usuario_editor'], PERMISOS['USUARIOS']['ELIMIN
 
 
 try {
-    // Verificar que editor sea administrador
-    $stmt = $pdo->prepare("SELECT r.nombre AS rol FROM usuarios u 
-                           JOIN rol r ON u.rol_id = r.id 
-                           WHERE u.id = ?");
-    $stmt->execute([$data['id_usuario_editor']]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$usuario || $usuario['rol'] !== 'administrador') {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Acceso denegado. Solo administradores pueden eliminar usuarios."]);
-        exit();
-    }
-
-    // Verificar que usuario a eliminar existe
     $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
     $stmt->execute([$data['id_usuario_objetivo']]);
     if (!$stmt->fetch()) {

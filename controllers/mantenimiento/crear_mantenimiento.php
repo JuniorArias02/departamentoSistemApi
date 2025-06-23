@@ -3,6 +3,7 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
+require_once __DIR__ . '/../utils/registrar_actividad.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -153,28 +154,13 @@ try {
 
 
         // REGISTRAR ACTIVIDAD DE CREACIÓN
-        $stmtAct = $pdo->prepare("INSERT INTO actividades 
-            (usuario_id, accion, tabla_afectada, registro_id, fecha)
-            VALUES 
-            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
-
-        if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['MANTENIMIENTOS']['CREAR'])) {
-            http_response_code(403);
-            echo json_encode([
-                "success" => false,
-                "message" => "Acceso denegado. No tienes permiso para ver datos de inventario."
-            ]);
-            exit();
-        }
-
-        $stmtAct->execute([
-            "usuario_id" => $data["creado_por"],
-            "accion" => "Creó el mantenimiento de IPS'" . $data["titulo"] . "'",
-            "tabla_afectada" => "mantenimientos",
-            "registro_id" => $idInsertado,
-            "fecha" => $fechaColombia
-        ]);
-
+        registrarActividad(
+            $pdo,
+            $data['creado_por'],
+            "Creo Mantenimiento con Titulo {$data['titulo']}",
+            "mantenimientos",
+            $data['id']
+        );
 
         echo json_encode([
             "msg" => "Mantenimiento de freezer registrado con éxito",
