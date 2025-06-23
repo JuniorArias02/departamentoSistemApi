@@ -21,7 +21,6 @@ if (!tienePermiso($pdo, $data['id_usuario_editor'], PERMISOS['USUARIOS']['EDITAR
     exit();
 }
 
-
 try {
     // Validar que el usuario a editar existe
     $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
