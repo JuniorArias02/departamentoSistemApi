@@ -1,9 +1,17 @@
 <?php
+ini_set('memory_limit', '512M');  // 512MB de memoria
+ini_set('post_max_size', '100M');  // 100MB máximo POST
+ini_set('upload_max_filesize', '96M'); // 96MB máximo upload
+ini_set('max_execution_time', '600'); // 10 minutos timeout
+ini_set('max_input_time', '300'); // 5 minutos para recibir datos
+
+
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
+require_once __DIR__ . '/../services/ImageService.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -28,19 +36,14 @@ foreach ($camposObligatorios as $campo) {
         exit;
     }
 
-    if ($campo === "imagen" && trim($data[$campo]) === "") {
+    if (trim($data[$campo]) === "") {
         http_response_code(400);
-        echo json_encode(["error" => "Debe subir una imagen del mantenimiento."]);
-        exit;
-    }
-
-    if ($campo !== "imagen" && trim($data[$campo]) === "") {
-        http_response_code(400);
-        echo json_encode(["error" => "El campo '$campo' no puede estar vacío."]);
+        echo json_encode(["error" => $campo === "imagen"
+            ? "Debe subir una imagen del mantenimiento."
+            : "El campo '$campo' no puede estar vacío."]);
         exit;
     }
 }
-
 
 // Validar que la imagen sea base64 y de tipo imagen
 if (!preg_match('/^data:image\/(png|jpg|jpeg|webp|gif);base64,/', $data['imagen'])) {
@@ -49,24 +52,29 @@ if (!preg_match('/^data:image\/(png|jpg|jpeg|webp|gif);base64,/', $data['imagen'
     exit;
 }
 
-// Procesar imagen
-$extension = explode('/', explode(';', $data['imagen'])[0])[1];
-$nombreImagen = uniqid('img_') . '.' . $extension;
-$rutaRelativa = 'public/mantenimientos/' . $nombreImagen;
-$rutaGuardado = __DIR__ . '/../../' . $rutaRelativa;
+// Procesar imagen con compresión
+set_time_limit(600); // 10 minutos máximo
 
-$imagenBase64 = preg_replace('/^data:image\/\w+;base64,/', '', $data['imagen']);
-$imagenBase64 = str_replace(' ', '+', $imagenBase64);
+try {
+    $imageResult = ImageService::uploadAndCompressImage(
+        $data['imagen'],
+        __DIR__ . '/../../public/mantenimientos/',
+        1600,   // Ancho máximo aumentado para imágenes grandes
+        null    // La calidad ahora se calcula automáticamente
+    );
 
-if (!file_put_contents($rutaGuardado, base64_decode($imagenBase64))) {
-    http_response_code(500);
-    echo json_encode(["error" => "No se pudo guardar la imagen en el servidor"]);
-    exit;
+    $data['imagen'] = $imageResult['public_url'];
+
+    // Registrar información de compresión si es necesario
+    error_log("Imagen procesada - Original: {$imageResult['original_size']} bytes, Final: {$imageResult['size']} bytes, Calidad: {$imageResult['quality_applied']}");
+} catch (RuntimeException $e) {
+    http_response_code(400);
+    die(json_encode([
+        'error' => $e->getMessage(),
+        'max_size' => '90MB',
+        'allowed_types' => 'JPEG, PNG, WEBP, GIF'
+    ]));
 }
-
-// Guardar la ruta en el array
-$data['imagen'] = $rutaRelativa;
-
 try {
     if (!empty($data['id'])) {
         $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos WHERE id = :id");
