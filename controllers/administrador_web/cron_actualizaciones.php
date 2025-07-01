@@ -1,33 +1,29 @@
 <?php
-require_once __DIR__ . '/../../database/conexion.php';
-
-// Establecer zona horaria de Colombia
+require_once '/home/u528159717/public_html/deparSistemApi/database/conexion.php';
 date_default_timezone_set('America/Bogota');
+file_put_contents("log.txt", "Se ejecutó\n", FILE_APPEND);
 $hoy = date('Y-m-d');
 
-// Cambiar a 'en progreso' si fecha_actualizacion es hoy
-$sqlEnProgreso = "UPDATE actualizaciones_web 
-                  SET estado = 'en progreso' 
-                  WHERE fecha_actualizacion = :hoy 
-                  AND estado != 'en progreso'";
-$stmt = $pdo->prepare($sqlEnProgreso);
-$stmt->execute([':hoy' => $hoy]);
-
-// Cambiar a 'finalizado' si fecha_actualizacion < hoy
+// 1. Finalizar actualizaciones pasadas
 $sqlFinalizado = "UPDATE actualizaciones_web 
                   SET estado = 'finalizado' 
-                  WHERE fecha_actualizacion < :hoy 
+                  WHERE DATE(fecha_actualizacion) < :hoy 
                   AND estado != 'finalizado'";
-$stmt = $pdo->prepare($sqlFinalizado);
-$stmt->execute([':hoy' => $hoy]);
+$pdo->prepare($sqlFinalizado)->execute([':hoy' => $hoy]);
 
-// (Opcional) Asegurar que las que están en rango de visibilidad estén 'pendientes'
+// 2. Marcar como en progreso si es hoy
+$sqlEnProgreso = "UPDATE actualizaciones_web 
+                  SET estado = 'en progreso' 
+                  WHERE DATE(fecha_actualizacion) = :hoy 
+                  AND estado != 'en progreso'";
+$pdo->prepare($sqlEnProgreso)->execute([':hoy' => $hoy]);
+
+// 3. Marcar como pendiente si está en rango pero aún no es la fecha de actualización
 $sqlPendientes = "UPDATE actualizaciones_web 
                   SET estado = 'pendiente' 
                   WHERE :hoy BETWEEN mostrar_desde AND mostrar_hasta 
-                  AND fecha_actualizacion > :hoy 
+                  AND DATE(fecha_actualizacion) > :hoy 
                   AND estado != 'pendiente'";
-$stmt = $pdo->prepare($sqlPendientes);
-$stmt->execute([':hoy' => $hoy]);
+$pdo->prepare($sqlPendientes)->execute([':hoy' => $hoy]);
 
 echo json_encode(['success' => true, 'message' => 'Actualizaciones revisadas']);

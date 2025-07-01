@@ -14,6 +14,7 @@ try {
         echo json_encode(["error" => "Se requieren: ID del mantenimiento, ID del usuario y estado de revisión"]);
         exit;
     }
+
     if (!tienePermiso($pdo, $data['usuario_id'], PERMISOS['MANTENIMIENTOS']['MARCAR_REVISADO'])) {
         http_response_code(403);
         echo json_encode([
@@ -33,10 +34,9 @@ try {
         exit;
     }
 
-    // Obtener fecha actual
     $fechaActual = date('Y-m-d H:i:s');
 
-    // Actualizar el mantenimiento (sin fecha_ultima_actualizacion)
+    // Actualizar el estado
     $stmt = $pdo->prepare("
         UPDATE mantenimientos
         SET 
@@ -48,9 +48,9 @@ try {
     ");
 
     $success = $stmt->execute([
-        $estaRevisado, // Usamos el valor recibido (0 o 1)
-        $estaRevisado ? $usuarioId : null, // Solo guarda usuario si está marcando como revisado
-        $estaRevisado ? $fechaActual : null, // Solo guarda fecha si está marcando como revisado
+        $estaRevisado,
+        $estaRevisado ? $usuarioId : null,
+        $estaRevisado ? $fechaActual : null,
         $mantenimientoId
     ]);
 
@@ -63,10 +63,18 @@ try {
         exit;
     }
 
-    $accion = $estaRevisado
-        ? "Marcó como revisado el mantenimiento ID {$mantenimientoId}"
-        : "Marcó como no revisado el mantenimiento ID {$mantenimientoId}";
+    // Obtener info del mantenimiento (titulo y código)
+    $stmtInfo = $pdo->prepare("SELECT titulo, codigo FROM mantenimientos WHERE id = ?");
+    $stmtInfo->execute([$mantenimientoId]);
+    $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+    $titulo = $info['titulo'] ?? 'Desconocido';
+    $codigo = $info['codigo'] ?? 'Sin código';
 
+    $accion = $estaRevisado
+        ? "Marcó como revisado el mantenimiento '{$titulo}' (Código: {$codigo})"
+        : "Marcó como no revisado el mantenimiento '{$titulo}' (Código: {$codigo})";
+
+    // Registrar actividad
     registrarActividad(
         $pdo,
         $usuarioId,

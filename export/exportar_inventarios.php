@@ -2,7 +2,7 @@
 require_once '../vendor/autoload.php';
 require_once '../database/conexion.php';
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://departamento-sistemasips.vercel.app");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET");
 
@@ -46,7 +46,8 @@ $headers = [
     "Meses Depreciación",
     "Meses Dep. NIIF",
     "Tipo Adquisición",
-    "Fecha Calibrado"
+    "Fecha Calibrado",
+    "Sede"
 ];
 // Estilo para encabezados
 $col = 'A';
@@ -68,8 +69,9 @@ $sql = "SELECT
   i.soporte, i.descripcion, i.estado, i.marca, i.modelo, i.serial,
   i.escritura, i.matricula, i.valor_compra, i.salvamenta, i.depreciacion,
   i.depreciacion_niif, i.meses, i.meses_niif, i.tipo_adquisicion, i.calibrado,
-  i.creado_por, i.fecha_creacion
-FROM inventario i";
+  s.nombre AS sede_nombre
+FROM inventario i
+LEFT JOIN sedes s ON i.sede_id = s.id";
 
 $stmt = $pdo->query($sql);
 
@@ -119,6 +121,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $sheet->setCellValue($col++ . $rowNum, $row['meses_niif']);
     $sheet->setCellValue($col++ . $rowNum, $row['tipo_adquisicion']);
     $sheet->setCellValue($col++ . $rowNum, formatDate($row['calibrado']));
+    $sheet->setCellValue($col++ . $rowNum, $row['sede_nombre']);
 
     // Información de creación
     $rowNum++;
