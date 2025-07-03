@@ -7,15 +7,17 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $titulo = $data['titulo'] ?? null;
 $descripcion = $data['descripcion'] ?? '';
-$fecha_agendada = $data['fecha_agendada'] ?? null;
+$fecha_inicio = $data['fecha_inicio'] ?? null;
+$fecha_fin = $data['fecha_fin'] ?? null;
 $sede_id = $data['sede_id'] ?? null;
 $usuario_id = $data['usuario_id'] ?? null;
 
-if (!$titulo || !$fecha_agendada || !$sede_id || !$usuario_id) {
+if (!$titulo || !$fecha_inicio || !$fecha_fin || !$sede_id || !$usuario_id) {
     http_response_code(400);
     echo json_encode(["error" => "Faltan datos requeridos"]);
     exit;
 }
+
 
 try {
     $pdo->beginTransaction();
@@ -24,20 +26,27 @@ try {
     $sqlMantenimiento = "INSERT INTO mantenimientos (
         titulo, descripcion, sede_id, creado_por, fecha_creacion, fecha_ultima_actualizacion, esta_revisado
     ) VALUES (?, ?, ?, ?, NOW(), NOW(), 0)";
-    
+
     $stmt = $pdo->prepare($sqlMantenimiento);
     $stmt->execute([$titulo, $descripcion, $sede_id, $usuario_id]);
     $mantenimiento_id = $pdo->lastInsertId();
 
     // Crear agenda
     $sqlAgenda = "INSERT INTO agenda_mantenimientos (
-        mantenimiento_id, titulo, descripcion, sede_id, fecha_agendada, creado_por, fecha_creacion
-    ) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    mantenimiento_id, titulo, descripcion, sede_id, fecha_inicio, fecha_fin, creado_por, fecha_creacion
+) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt2 = $pdo->prepare($sqlAgenda);
     $stmt2->execute([
-        $mantenimiento_id, $titulo, $descripcion, $sede_id, $fecha_agendada, $usuario_id
+        $mantenimiento_id,
+        $titulo,
+        $descripcion,
+        $sede_id,
+        $fecha_inicio,
+        $fecha_fin,
+        $usuario_id
     ]);
+
     $agenda_id = $pdo->lastInsertId();
 
     // Registrar actividades
