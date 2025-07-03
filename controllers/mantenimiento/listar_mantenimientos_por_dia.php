@@ -3,6 +3,7 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_get.php';
 
 $fecha = $_GET['fecha'] ?? null;
+$usuario_id = $_GET['usuario_id'] ?? null;
 
 if (!$fecha) {
 	http_response_code(400);
@@ -11,7 +12,6 @@ if (!$fecha) {
 }
 
 try {
-	// Día completo
 	$inicioDia = date("Y-m-d 00:00:00", strtotime($fecha));
 	$finDia = date("Y-m-d 23:59:59", strtotime($fecha));
 
@@ -20,11 +20,23 @@ try {
 	        INNER JOIN mantenimientos m ON m.id = a.mantenimiento_id
 	        WHERE a.fecha_inicio BETWEEN :inicio AND :fin";
 
+	// Si se pasa un técnico específico
+	if ($usuario_id) {
+		$sql .= " AND a.creado_por = :usuario_id";
+	}
+
 	$stmt = $pdo->prepare($sql);
-	$stmt->execute([
+
+	$params = [
 		"inicio" => $inicioDia,
 		"fin" => $finDia
-	]);
+	];
+
+	if ($usuario_id) {
+		$params["usuario_id"] = $usuario_id;
+	}
+
+	$stmt->execute($params);
 
 	echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (PDOException $e) {

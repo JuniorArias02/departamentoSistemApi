@@ -3,6 +3,9 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
 
+date_default_timezone_set("America/Bogota");
+
+// Capturar los datos del frontend
 $data = json_decode(file_get_contents("php://input"), true);
 
 $titulo = $data['titulo'] ?? null;
@@ -10,31 +13,56 @@ $descripcion = $data['descripcion'] ?? '';
 $fecha_inicio = $data['fecha_inicio'] ?? null;
 $fecha_fin = $data['fecha_fin'] ?? null;
 $sede_id = $data['sede_id'] ?? null;
-$usuario_id = $data['usuario_id'] ?? null;
 
-if (!$titulo || !$fecha_inicio || !$fecha_fin || !$sede_id || !$usuario_id) {
+$usuario_id = $data['usuario_id'] ?? null; // quien agenda
+$usuario_asignado = $data['usuario_asignado'] ?? null; // técnico que hará el mantenimiento
+
+$campos_faltantes = [];
+
+if (!$titulo) $campos_faltantes[] = 'titulo';
+if (!$fecha_inicio) $campos_faltantes[] = 'fecha_inicio';
+if (!$fecha_fin) $campos_faltantes[] = 'fecha_fin';
+if (!$sede_id) $campos_faltantes[] = 'sede_id';
+if (!$usuario_id) $campos_faltantes[] = 'usuario_id';
+if (!$usuario_asignado) $campos_faltantes[] = 'usuario_asignado';
+
+if (!empty($campos_faltantes)) {
+    http_response_code(400);
+    echo json_encode([
+        "error" => "Faltan los siguientes campos: " . implode(', ', $campos_faltantes),
+        "data_recibida" => $data // Esto es clave para debug
+    ]);
+    exit;
+}
+// Validar campos obligatorios
+if (!$titulo || !$fecha_inicio || !$fecha_fin || !$sede_id || !$usuario_id || !$usuario_asignado) {
     http_response_code(400);
     echo json_encode(["error" => "Faltan datos requeridos"]);
     exit;
 }
 
-
 try {
     $pdo->beginTransaction();
 
-    // Crear mantenimiento
+    // Crear mantenimiento (lo crea el técnico)
     $sqlMantenimiento = "INSERT INTO mantenimientos (
         titulo, descripcion, sede_id, creado_por, fecha_creacion, fecha_ultima_actualizacion, esta_revisado
     ) VALUES (?, ?, ?, ?, NOW(), NOW(), 0)";
 
     $stmt = $pdo->prepare($sqlMantenimiento);
-    $stmt->execute([$titulo, $descripcion, $sede_id, $usuario_id]);
+    $stmt->execute([
+        $titulo,
+        $descripcion,
+        $sede_id,
+        $usuario_asignado
+    ]);
+
     $mantenimiento_id = $pdo->lastInsertId();
 
-    // Crear agenda
+    // Crear agendamiento (lo agenda el usuario logueado)
     $sqlAgenda = "INSERT INTO agenda_mantenimientos (
-    mantenimiento_id, titulo, descripcion, sede_id, fecha_inicio, fecha_fin, creado_por, fecha_creacion
-) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        mantenimiento_id, titulo, descripcion, sede_id, fecha_inicio, fecha_fin, creado_por, agendado_por, fecha_creacion
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt2 = $pdo->prepare($sqlAgenda);
     $stmt2->execute([
@@ -44,18 +72,18 @@ try {
         $sede_id,
         $fecha_inicio,
         $fecha_fin,
+        $usuario_asignado,
         $usuario_id
     ]);
 
     $agenda_id = $pdo->lastInsertId();
 
-    // Registrar actividades
-    // registrarActividad($pdo, $usuario_id, "Creó mantenimiento '$titulo'", "mantenimientos", $mantenimiento_id);
-    registrarActividad($pdo, $usuario_id, "Agendó mantenimiento '$titulo'", "agenda_mantenimientos", $agenda_id);
+    // Registrar actividad
+    registrarActividad($pdo, $usuario_id, "Agendó mantenimiento '$titulo' para el usuario ID $usuario_asignado", "agenda_mantenimientos", $agenda_id);
 
     $pdo->commit();
 
-    echo json_encode(["mensaje" => "Mantenimiento y agendamiento creado correctamente"]);
+    echo json_encode(["mensaje" => "Mantenimiento agendado correctamente"]);
 } catch (Exception $e) {
     $pdo->rollBack();
     http_response_code(500);
