@@ -1,12 +1,11 @@
 Array
 (
-    [id] => 1270
-    [codigo] => WRGQAWARGWRG
-    [nombre] => GWRG
-    [dependencia] => GRG
-    [responsable] => 
-    [marca] => 
-    [modelo] => 
+    [codigo] => EC10301
+    [nombre] => TABLET DIGITALIZADORA 
+    [dependencia] => CONSULTORIO 6
+    [responsable] => MAITY ROJAS
+    [marca] => WACOM 
+    [modelo] => CTL-472
     [serial] => 
     [sede_id] => 3
     [codigo_barras] => 
