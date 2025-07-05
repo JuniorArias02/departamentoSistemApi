@@ -41,6 +41,8 @@ const PERMISOS = [
         'VER_PROPIOS' => 'ver_propios_mantenimientos',
         'CONTAR_TODOS_PENDIENTES' => 'contar_todos_pendientes_mantenimientos',
         'CONTAR_PROPIOS_PENDIENTES' => 'contar_propios_pendientes_mantenimientos',
+        'RECIBIR_MANTENIMIENTO' => 'recibir_mantenimiento',
+
     ],
 
     // GESTIÓN DE PERMISOS
@@ -68,3 +70,4 @@ const PERMISOS = [
         'VER_AVISOS' => 'ver_avisos_actualizacion_web',
     ],
 ];
+

@@ -1,0 +1,21 @@
+AddHandler application/x-httpd-alt-php83___lsphp .php
+
+<IfModule lsapi_module>
+  php_value upload_max_filesize 512M
+  php_value post_max_size 512M
+  php_value memory_limit 512M
+  php_value max_execution_time 600
+  php_value max_input_time 600
+</IfModule>
+
+LimitRequestBody 536870912
+
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "https://departamento-sistemasips.vercel.app"
+  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+<IfModule LiteSpeed>
+  CacheDisable public /
+</IfModule>
