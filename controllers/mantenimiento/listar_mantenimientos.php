@@ -20,7 +20,7 @@ try {
         exit;
     }
 
-    // Verificar si puede ver TODOS los registros o solo los propios
+    // Verificar permisos
     $puedeVerTodos = tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_TODOS']);
     $puedeVerPropios = tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_PROPIOS']);
 
@@ -33,7 +33,7 @@ try {
         exit();
     }
 
-    // Consulta base
+    // Consulta base de mantenimientos
     $sql = "SELECT 
                 mf.id,
                 mf.titulo,
@@ -79,9 +79,32 @@ try {
 
     $mantenimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Formatear respuesta
+    // Agregar agenda a cada mantenimiento
     foreach ($mantenimientos as &$mantenimiento) {
         $mantenimiento['esta_revisado'] = (bool)$mantenimiento['esta_revisado'];
+
+        $stmtAgenda = $pdo->prepare("SELECT 
+            a.id,
+            a.titulo,
+            a.descripcion,
+            a.sede_id,
+            s.nombre AS nombre_sede,
+            a.fecha_inicio,
+            a.fecha_fin,
+            a.creado_por,
+            u1.nombre_completo AS nombre_creador,
+            a.agendado_por,
+            u2.nombre_completo AS nombre_agendador
+        FROM agenda_mantenimientos a
+        LEFT JOIN sedes s ON a.sede_id = s.id
+        LEFT JOIN usuarios u1 ON a.creado_por = u1.id
+        LEFT JOIN usuarios u2 ON a.agendado_por = u2.id
+        WHERE a.mantenimiento_id = ?
+        ORDER BY a.fecha_inicio DESC");
+
+        $stmtAgenda->execute([$mantenimiento['id']]);
+        $agenda = $stmtAgenda->fetch(PDO::FETCH_ASSOC);
+        $mantenimiento['agenda'] = $agenda ?: null;
     }
 
     http_response_code(200);

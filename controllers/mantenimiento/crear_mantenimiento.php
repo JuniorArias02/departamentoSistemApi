@@ -25,41 +25,46 @@ foreach ($camposObligatorios as $campo) {
     }
 }
 
-// Validar que se haya enviado imagen
-if (!isset($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+$esEdicion = !empty($_POST['id']);
+$rutaRelativa = null;
+
+// Verificar imagen si aplica
+if ((!$esEdicion && (!isset($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK)) ||
+    ($esEdicion && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['imagen']['error'] !== UPLOAD_ERR_OK)) {
     http_response_code(400);
     echo json_encode(["error" => "Debe subir una imagen válida."]);
     exit;
 }
 
-// Validar tipo de imagen
-$tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-$tipoImagen = $_FILES['imagen']['type'];
+// Procesar imagen si existe
+if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+    $tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    $tipoImagen = $_FILES['imagen']['type'];
 
-if (!in_array($tipoImagen, $tiposPermitidos)) {
-    http_response_code(400);
-    echo json_encode(["error" => "Solo se permiten imágenes JPG, PNG, WEBP o GIF."]);
-    exit;
-}
+    if (!in_array($tipoImagen, $tiposPermitidos)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Solo se permiten imágenes JPG, PNG, WEBP o GIF."]);
+        exit;
+    }
 
-// Procesar imagen
-$extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
-$nombreImagen = uniqid('img_') . '.' . $extension;
-$rutaRelativa = 'public/mantenimientos/' . $nombreImagen;
-$rutaGuardado = __DIR__ . '/../../' . $rutaRelativa;
+    $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+    $nombreImagen = uniqid('img_') . '.' . $extension;
+    $rutaRelativa = 'public/mantenimientos/' . $nombreImagen;
+    $rutaGuardado = __DIR__ . '/../../' . $rutaRelativa;
 
-if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaGuardado)) {
-    http_response_code(500);
-    echo json_encode(["error" => "No se pudo guardar la imagen."]);
-    exit;
+    if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaGuardado)) {
+        http_response_code(500);
+        echo json_encode(["error" => "No se pudo guardar la imagen."]);
+        exit;
+    }
 }
 
 $data = $_POST;
 
 try {
-    if (!empty($data['id'])) {
-        // MODO EDICIÓN
-        $stmtCheck = $pdo->prepare("SELECT revisado_por FROM mantenimientos WHERE id = :id");
+    if ($esEdicion) {
+        // Verificar si ya fue revisado
+        $stmtCheck = $pdo->prepare("SELECT revisado_por, imagen FROM mantenimientos WHERE id = :id");
         $stmtCheck->execute(["id" => $data["id"]]);
         $mantenimiento = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
@@ -78,6 +83,9 @@ try {
             exit();
         }
 
+        // Mantener imagen actual si no se sube nueva
+        $rutaFinal = $rutaRelativa ?? $mantenimiento['imagen'];
+
         $stmt = $pdo->prepare("UPDATE mantenimientos SET 
             titulo = :titulo,
             codigo = :codigo,
@@ -86,7 +94,8 @@ try {
             sede_id = :sede_id,
             nombre_receptor = :nombre_receptor,
             imagen = :imagen,
-            descripcion = :descripcion
+            descripcion = :descripcion,
+            fecha_ultima_actualizacion = NOW()
             WHERE id = :id");
 
         $stmt->execute([
@@ -96,23 +105,18 @@ try {
             "dependencia" => $data["dependencia"],
             "sede_id" => $data["sede_id"],
             "nombre_receptor" => $data["nombre_receptor"],
-            "imagen" => $rutaRelativa,
+            "imagen" => $rutaFinal,
             "descripcion" => $data["descripcion"] ?? null,
             "id" => $data["id"]
         ]);
 
-        $stmtAct = $pdo->prepare("INSERT INTO actividades 
-            (usuario_id, accion, tabla_afectada, registro_id, fecha)
-            VALUES 
-            (:usuario_id, :accion, :tabla_afectada, :registro_id, :fecha)");
-
-        $stmtAct->execute([
-            "usuario_id" => $data["creado_por"],
-            "accion" => "Actualizó el mantenimiento IPS '" . $data["titulo"] . "'",
-            "tabla_afectada" => "mantenimientos",
-            "registro_id" => $data["id"],
-            "fecha" => date('Y-m-d H:i:s')
-        ]);
+        registrarActividad(
+            $pdo,
+            $data["creado_por"],
+            "Actualizó mantenimiento con título '{$data["titulo"]}'",
+            "mantenimientos",
+            $data["id"]
+        );
 
         echo json_encode(["msg" => "Mantenimiento actualizado con éxito"]);
     } else {
@@ -125,29 +129,29 @@ try {
             :imagen, :descripcion, :creado_por, NOW())");
 
         $stmt->execute([
-            "titulo" => $_POST["titulo"],
-            "codigo" => $_POST["codigo"],
-            "modelo" => $_POST["modelo"],
-            "dependencia" => $_POST["dependencia"],
-            "sede_id" => $_POST["sede_id"],
-            "nombre_receptor" => $_POST["nombre_receptor"],
+            "titulo" => $data["titulo"],
+            "codigo" => $data["codigo"],
+            "modelo" => $data["modelo"],
+            "dependencia" => $data["dependencia"],
+            "sede_id" => $data["sede_id"],
+            "nombre_receptor" => $data["nombre_receptor"],
             "imagen" => $rutaRelativa,
-            "descripcion" => $_POST["descripcion"] ?? null,
-            "creado_por" => $_POST["creado_por"]
+            "descripcion" => $data["descripcion"] ?? null,
+            "creado_por" => $data["creado_por"]
         ]);
 
         $idInsertado = $pdo->lastInsertId();
 
         registrarActividad(
             $pdo,
-            $_POST['creado_por'],
-            "Creo Mantenimiento con Titulo {$_POST['titulo']}",
+            $data["creado_por"],
+            "Creó mantenimiento con título '{$data["titulo"]}'",
             "mantenimientos",
             $idInsertado
         );
 
         echo json_encode([
-            "msg" => "Mantenimiento de freezer registrado con éxito",
+            "msg" => "Mantenimiento registrado con éxito",
             "id" => $idInsertado
         ]);
     }
