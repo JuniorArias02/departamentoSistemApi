@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
+class ComposerStaticInitf34c14d2b0a1b16decd12d66f75dc6fe
 {
     public static $files = array (
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
@@ -34,6 +34,7 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         ),
         'M' => 
         array (
+            'MyCLabs\\Enum\\' => 13,
             'Matrix\\' => 7,
         ),
         'G' => 
@@ -88,6 +89,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
+        'MyCLabs\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
+        ),
         'Matrix\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
@@ -118,7 +123,6 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
-        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
@@ -128,10 +132,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit62e10e6c8df9afc192311b196c75bb33::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit62e10e6c8df9afc192311b196c75bb33::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit62e10e6c8df9afc192311b196c75bb33::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit62e10e6c8df9afc192311b196c75bb33::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf34c14d2b0a1b16decd12d66f75dc6fe::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf34c14d2b0a1b16decd12d66f75dc6fe::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf34c14d2b0a1b16decd12d66f75dc6fe::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitf34c14d2b0a1b16decd12d66f75dc6fe::$classMap;
 
         }, null, ClassLoader::class);
     }
