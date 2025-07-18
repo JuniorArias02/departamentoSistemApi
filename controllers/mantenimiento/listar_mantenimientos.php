@@ -82,7 +82,10 @@ try {
     // Agregar agenda a cada mantenimiento
     foreach ($mantenimientos as &$mantenimiento) {
         $mantenimiento['esta_revisado'] = (bool)$mantenimiento['esta_revisado'];
-
+        if (isset($mantenimiento['imagen']) && is_string($mantenimiento['imagen'])) {
+            $decoded = json_decode($mantenimiento['imagen'], true);
+            $mantenimiento['imagen'] = is_array($decoded) ? $decoded : [];
+        }
         $stmtAgenda = $pdo->prepare("SELECT 
             a.id,
             a.titulo,

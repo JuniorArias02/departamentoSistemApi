@@ -3,7 +3,8 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_get.php';
 
 $fecha = $_GET['fecha'] ?? null;
-$usuario_id = $_GET['usuario_id'] ?? null;
+$usuario_id = isset($_GET['usuario_id']) ? (int) $_GET['usuario_id'] : null;
+
 
 if (!$fecha) {
 	http_response_code(400);
@@ -21,9 +22,10 @@ try {
 	        WHERE a.fecha_inicio BETWEEN :inicio AND :fin";
 
 	// Si se pasa un técnico específico
-	if ($usuario_id) {
+	if ($usuario_id !== null && $usuario_id !== '') {
 		$sql .= " AND a.creado_por = :usuario_id";
 	}
+
 
 	$stmt = $pdo->prepare($sql);
 
@@ -32,9 +34,12 @@ try {
 		"fin" => $finDia
 	];
 
-	if ($usuario_id) {
+	if ($usuario_id !== null && $usuario_id !== '') {
 		$params["usuario_id"] = $usuario_id;
 	}
+
+	error_log("SQL: " . $sql);
+	error_log("Params: " . json_encode($params));
 
 	$stmt->execute($params);
 

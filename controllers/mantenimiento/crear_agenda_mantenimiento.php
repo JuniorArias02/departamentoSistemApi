@@ -2,6 +2,10 @@
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
+require_once __DIR__ . '/../../notificaciones/enviarCorreoMantenimientoAgendado.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
+
 
 date_default_timezone_set("America/Bogota");
 
@@ -30,7 +34,7 @@ if (!empty($campos_faltantes)) {
     http_response_code(400);
     echo json_encode([
         "error" => "Faltan los siguientes campos: " . implode(', ', $campos_faltantes),
-        "data_recibida" => $data // Esto es clave para debug
+        "data_recibida" => $data
     ]);
     exit;
 }
@@ -81,6 +85,29 @@ try {
     // Registrar actividad
     registrarActividad($pdo, $usuario_id, "Agendó mantenimiento '$titulo' para el usuario ID $usuario_asignado", "agenda_mantenimientos", $agenda_id);
 
+
+    $sqlCorreo = $pdo->prepare("SELECT correo, nombre_completo FROM usuarios WHERE id = ?");
+    $sqlCorreo->execute([$usuario_asignado]);
+    $tecnico = $sqlCorreo->fetch();
+
+    $sqlSede = $pdo->prepare("SELECT nombre FROM sedes WHERE id = ?");
+    $sqlSede->execute([$sede_id]);
+    $sede = $sqlSede->fetch();
+    $sedeNombre = $sede ? $sede['nombre'] : 'Sede desconocida';
+
+    $enviado = enviarCorreoMantenimientoAgendado(
+        $tecnico['correo'],
+        $tecnico['nombre_completo'],
+        $titulo,
+        $descripcion,
+        $fecha_inicio,
+        $fecha_fin,
+        $sedeNombre
+    );
+
+    if (!$enviado) {
+        error_log("⚠️ No se pudo enviar el correo al técnico {$tecnico['correo']}");
+    }
     $pdo->commit();
 
     echo json_encode(["mensaje" => "Mantenimiento agendado correctamente"]);

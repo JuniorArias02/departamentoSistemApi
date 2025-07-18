@@ -146,7 +146,7 @@ for ($i = 1; $i <= $colCount; $i++) {
     $colLetter = Coordinate::stringFromColumnIndex($i);
     $sheet->getColumnDimension($colLetter)->setAutoSize(true);
 }
-
+    
 // Configurar hoja para mejor visualización
 $sheet->setAutoFilter("A1:{$lastColLetter}1");
 $sheet->freezePane('A2');

@@ -45,6 +45,13 @@ const PERMISOS = [
 
     ],
 
+    'AGENDAMIENTO_MANTENIMIENTOS' => [
+        'MENU_ITEM' => "menu_item_agendamiento_mantenimientos",
+        'VER_CALENDARIO' => "ver_calendario_mantenimientos",
+        'VER_PROGRAMADOS' => "ver_programados_mantenimientos",
+        'VER_TODOS' => "ver_todos_eventos_agendados",
+    ],
+
     // GESTIÓN DE PERMISOS
     'GESTION_PERMISOS' => [
         'MENU_ITEM' => 'menu_item_permisos',
@@ -70,4 +77,3 @@ const PERMISOS = [
         'VER_AVISOS' => 'ver_avisos_actualizacion_web',
     ],
 ];
-

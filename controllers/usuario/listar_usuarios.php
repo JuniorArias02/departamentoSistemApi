@@ -25,7 +25,8 @@ if (!tienePermiso($pdo, $data['user_id'], PERMISOS['USUARIOS']['VER_DATOS'])) {
 
 try {
     // Traer todos los usuarios con su rol por nombre
-    $stmt = $pdo->prepare("SELECT u.id, u.nombre_completo, u.usuario, u.estado, r.nombre AS rol FROM usuarios u JOIN rol r ON u.rol_id = r.id");
+    $stmt = $pdo->prepare("SELECT u.id, u.nombre_completo, u.usuario, u.correo, u.telefono, u.estado, r.nombre AS rol FROM usuarios u JOIN rol r ON u.rol_id = r.id");
+
     $stmt->execute();
     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
