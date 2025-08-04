@@ -1,13 +1,13 @@
 Array
 (
-    [codigo] => ME100571
-    [nombre] => EAFAEF
-    [dependencia] => 
+    [codigo] => ME0100
+    [nombre] => SILLA CON RODACHINES NEGRA
+    [dependencia] => SALA DE ADMINISTRACIÓN DE MEDICAMENTOS 
     [responsable] => 
     [marca] => 
     [modelo] => 
     [serial] => 
-    [sede_id] => 2
+    [sede_id] => 1
     [codigo_barras] => 
     [grupo] => 
     [vida_util] => 
@@ -30,5 +30,5 @@ Array
     [tipo_adquisicion] => 
     [calibrado] => 
     [observaciones] => 
-    [creado_por] => 1
+    [creado_por] => 8
 )
