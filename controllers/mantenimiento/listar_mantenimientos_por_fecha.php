@@ -54,7 +54,7 @@ try {
 	];
 
 	// Si NO tiene permiso para ver todos, filtrar por agendado_por
-	if (!tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_TODOS'])) {
+	if (!tienePermiso($pdo, $usuarioId, PERMISOS['MANTENIMIENTOS']['VER_TODOS_EVENTOS_AGENDADOS'])) {
 		$sql .= " AND a.creado_por = :usuario_id";
 		$params["usuario_id"] = $usuarioId;
 	}

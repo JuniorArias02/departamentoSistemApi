@@ -38,6 +38,7 @@ const PERMISOS = [
         'EDITAR' => 'editar_mantenimiento',
         'ELIMINAR' => 'eliminar_mantenimiento',
         'VER_TODOS' => 'ver_todos_mantenimientos',
+        'VER_TODOS_EVENTOS_AGENDADOS' => 'ver_todos_eventos_agendados',
         'VER_PROPIOS' => 'ver_propios_mantenimientos',
         'CONTAR_TODOS_PENDIENTES' => 'contar_todos_pendientes_mantenimientos',
         'CONTAR_PROPIOS_PENDIENTES' => 'contar_propios_pendientes_mantenimientos',
