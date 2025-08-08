@@ -157,7 +157,8 @@ try {
 
 	echo json_encode([
 		"status" => true,
-		"message" => "Equipo creado correctamente"
+		"message" => "Equipo creado correctamente",
+		"equipo_id" => $equipo_id
 	]);
 } catch (PDOException $e) {
 	$pdo->rollBack();

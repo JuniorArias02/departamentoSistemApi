@@ -78,4 +78,9 @@ const PERMISOS = [
         'ELIMINAR_AVISO_ACTUALIZACION' => 'eliminar_aviso_actualizacion_web',
         'VER_AVISOS' => 'ver_avisos_actualizacion_web',
     ],
+
+    // QUIPOS DE COMPUTO
+    'GESTION_EQUIPOS' => [
+        'ELIMINAR' => 'eliminar_equipo',
+    ],
 ];
