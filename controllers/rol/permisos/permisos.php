@@ -79,4 +79,8 @@ const PERMISOS = [
         'ELIMINAR_AVISO_ACTUALIZACION' => 'eliminar_aviso_actualizacion_web',
         'VER_AVISOS' => 'ver_avisos_actualizacion_web',
     ],
+
+    'GESTION_COMPRA_PEDIDOS' => [
+        'RECIBIR_NUEVOS_PEDIDOS' => 'recibir_correo_nuevos_pedidos',
+    ],
 ];
