@@ -46,6 +46,7 @@ const PERMISOS = [
         'EXPORTAR_TODOS' => 'exportar_todos_informes_mantenimientos',
         'EXPORTAR_PROPIOS' => 'exportar_propios_informes_mantenimientos',
         'EXPORTAR_ASIGNADOS' => 'exportar_informes_asignados_mantenimientos',
+        'GRAFICAR_MANTENIMIENTO_PROPIA_SEDE' => 'graficar_mantenimiento_propia_sede',
 
     ],
     'AGENDAMIENTO_MANTENIMIENTOS' => [
@@ -70,6 +71,7 @@ const PERMISOS = [
         'EDITAR' => 'editar_inventario',
         'ELIMINAR' => 'eliminar_inventario',
         'EXPORTAR' => 'exportar_inventario',
+        'GRAFICAR_INVENTARIO_PROPIA_SEDE' => 'graficar_inventario_propia_sede',
     ],
 
 
