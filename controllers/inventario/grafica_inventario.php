@@ -52,7 +52,6 @@ try {
 
 	$resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	echo json_encode($resultados);
-
 } catch (PDOException $e) {
 	http_response_code(500);
 	echo json_encode(["error" => "Error al obtener datos de inventario: " . $e->getMessage()]);
