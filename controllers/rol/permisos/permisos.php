@@ -84,6 +84,8 @@ const PERMISOS = [
 
     'GESTION_COMPRA_PEDIDOS' => [
         'RECIBIR_NUEVOS_PEDIDOS' => 'recibir_correo_nuevos_pedidos',
+        'VER_PEDIDOS_PROPIOS' => 'ver_pedidos_propios',
+        'VER_PEDIDOS_ENCARGADO' => 'ver_pedidos_encargado',
         'RECHAZAR_PEDIDO' => 'rechazar_pedido',
         'APROBAR_PEDIDO' => 'aprobar_pedido'
     ],

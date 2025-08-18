@@ -133,7 +133,6 @@ HTML;
 
         $mail->send();
         return true;
-
     } catch (Exception $e) {
         error_log("Error al enviar correo: {$mail->ErrorInfo}");
         return false;

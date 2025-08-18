@@ -1,6 +1,8 @@
 <?php
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../rol/permisos/permisos.php';
+require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
 
 // Verificar campos obligatorios
@@ -16,6 +18,13 @@ if (!isset($_POST['tipo_firma']) || empty($_POST['tipo_firma'])) {
     exit;
 }
 
+if (!isset($_POST['id_usuario']) || empty($_POST['id_usuario'])) {
+    http_response_code(400);
+    echo json_encode(["error" => "El id_usuario es obligatorio"]);
+    exit;
+}
+
+
 if (!isset($_FILES['firma']) || $_FILES['firma']['error'] !== UPLOAD_ERR_OK) {
     http_response_code(400);
     echo json_encode(["error" => "La firma es obligatoria"]);
@@ -24,6 +33,7 @@ if (!isset($_FILES['firma']) || $_FILES['firma']['error'] !== UPLOAD_ERR_OK) {
 
 $id_pedido = intval($_POST['id_pedido']);
 $tipo_firma = $_POST['tipo_firma'];
+$usuarioId = $_POST['id_usuario'];
 
 // Validar tipo de firma permitido
 $firmas_permitidas = [
@@ -36,6 +46,18 @@ if (!in_array($tipo_firma, $firmas_permitidas)) {
     http_response_code(400);
     echo json_encode(["error" => "Tipo de firma no válido"]);
     exit;
+}
+
+// Validar permisos según tipo de firma
+switch ($tipo_firma) {
+    case 'proceso_compra_firma':
+    case 'responsable_aprobacion_firma':
+        if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['APROBAR_PEDIDO'])) {
+            http_response_code(403);
+            echo json_encode(["error" => "No tienes permisos para aprobar pedidos"]);
+            exit;
+        }
+        break;
 }
 
 // Validar formato de archivo
@@ -65,12 +87,29 @@ if (!move_uploaded_file($_FILES['firma']['tmp_name'], $ruta_absoluta)) {
 }
 
 try {
-    // Actualizar campo dinámico según el tipo de firma
-    $sql = "UPDATE cp_pedidos SET {$tipo_firma} = :firma WHERE id = :id";
+    $campo_fecha = null;
+    if ($tipo_firma === 'proceso_compra_firma') {
+        $campo_fecha = 'fecha_compra';
+    } elseif ($tipo_firma === 'responsable_aprobacion_firma') {
+        $campo_fecha = 'fecha_gerencia';
+    }
+
+   if ($campo_fecha) {
+        // Actualiza firma y fecha
+        $sql = "UPDATE cp_pedidos 
+                SET {$tipo_firma} = :firma, {$campo_fecha} = NOW() 
+                WHERE id = :id";
+    } else {
+        // Solo actualiza firma
+        $sql = "UPDATE cp_pedidos 
+                SET {$tipo_firma} = :firma 
+                WHERE id = :id";
+    }
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':firma' => $ruta_relativa,
-        ':id' => $id_pedido
+        ':id'    => $id_pedido
     ]);
 
     registrarActividad(

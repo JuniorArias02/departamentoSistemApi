@@ -5,6 +5,7 @@ require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
 require_once __DIR__ . '/../../notificaciones/enviarCorreoAprobadoPedido.php';
+require_once __DIR__ . '/../../notificaciones/enviarCorreoNuevoPedido.php';
 
 // Leer el JSON
 $data = json_decode(file_get_contents("php://input"), true);
@@ -15,6 +16,7 @@ if (!$data) {
     exit;
 }
 $usuarioId = $data['id_usuario'] ?? null;
+$tipoAprobacion = $data['tipo'] ?? 'compra';
 
 // Permiso para rechazar
 if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['APROBAR_PEDIDO'])) {
@@ -37,7 +39,7 @@ $usuarioCreador = $stmtCreador->fetch(PDO::FETCH_ASSOC);
 
 
 // Validar campos obligatorios
-$campos_obligatorios = ['id_usuario', 'id_pedido'];
+$campos_obligatorios = ['id_usuario', 'id_pedido', 'tipo'];
 foreach ($campos_obligatorios as $campo) {
     if (empty($data[$campo])) {
         http_response_code(400);
@@ -46,25 +48,34 @@ foreach ($campos_obligatorios as $campo) {
     }
 }
 
-// Forzar estado a "aprobado"
-$data['estado_compras'] = 'aprobado';
-$data['proceso_compra'] = $usuarioId; 
+// Forzar estado según tipo
+if ($tipoAprobacion === 'compra') {
+    $campoEstado = 'estado_compras';
+    $campoFirma = 'proceso_compra_firma';
+    $data['estado_compras'] = 'aprobado';
+    $data['proceso_compra'] = $usuarioId;
+} else { // gerencia
+    $campoEstado = 'estado_gerencia';
+    $campoFirma = 'responsable_aprobacion_firma';
+    $data['estado_gerencia'] = 'aprobado';
+    $data['responsable_aprobacion'] = $usuarioId;
+}
+
 
 try {
     // Actualizar pedido
     $sqlUpdate = "
-        UPDATE cp_pedidos
-        SET estado_compras = :estado_compras,
-            proceso_compra = :proceso_compra
-        WHERE id = :id_pedido
-    ";
+    UPDATE cp_pedidos
+    SET $campoEstado = :estado,
+        " . ($tipoAprobacion === 'compra' ? 'proceso_compra' : 'responsable_aprobacion') . " = :usuario
+    WHERE id = :id_pedido
+";
     $stmtUpdate = $pdo->prepare($sqlUpdate);
     $stmtUpdate->execute([
-        ':estado_compras' => $data['estado_compras'],
-        ':proceso_compra' => $data['proceso_compra'], 
+        ':estado' => $data[$campoEstado],
+        ':usuario' => $usuarioId,
         ':id_pedido' => $data['id_pedido']
     ]);
-
     // Obtener datos del pedido para el correo
     $sqlPedido = "
         SELECT fecha_solicitud, proceso_solicitante, tipo_solicitud, consecutivo
@@ -101,6 +112,38 @@ try {
             $pedido['consecutivo']
         );
     }
+
+    // Enviar correo a todos los usuarios con el permiso VER_PEDIDOS_ENCARGADO
+    if ($tipoAprobacion === 'compra') {
+        $sqlUsuariosConPermiso = "
+        SELECT u.correo, u.nombre_completo
+        FROM usuarios u
+        INNER JOIN rol r ON r.id = u.rol_id
+        INNER JOIN rol_permisos rp ON rp.rol_id = r.id
+        INNER JOIN permisos p ON p.id = rp.permiso_id
+        WHERE p.nombre = :permiso
+          AND u.estado = 1
+    ";
+
+        $stmtUsuarios = $pdo->prepare($sqlUsuariosConPermiso);
+        $stmtUsuarios->execute([
+            ':permiso' => PERMISOS['GESTION_COMPRA_PEDIDOS']['VER_PEDIDOS_ENCARGADO']
+        ]);
+        $usuariosConPermiso = $stmtUsuarios->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($usuariosConPermiso as $usuario) {
+            enviarCorreoNuevoPedido(
+                $usuario['correo'],
+                $usuario['nombre_completo'],
+                $pedido['fecha_solicitud'],
+                $pedido['proceso_solicitante'],
+                $pedido['tipo_solicitud'],
+                $pedido['observacion'] ?? '',
+                $pedido['consecutivo']
+            );
+        }
+    }
+
 
     echo json_encode([
         "success" => true,
