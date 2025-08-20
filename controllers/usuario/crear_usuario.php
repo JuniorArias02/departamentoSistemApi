@@ -22,13 +22,6 @@ if (!tienePermiso($pdo, $data['id_usuario_creador'], PERMISOS['USUARIOS']['CREAR
 }
 
 try {
-
-    $stmt = $pdo->prepare("SELECT r.nombre AS rol FROM usuarios u 
-                       JOIN rol r ON u.rol_id = r.id 
-                       WHERE u.id = ?");
-    $stmt->execute([$data['id_usuario_creador']]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
     // Crear nuevo usuario
     $nombre = $data['nombre_completo'];
     $usuarioNuevo = $data['usuario'];
@@ -40,9 +33,8 @@ try {
         $contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
     }
 
-
     $sql = "INSERT INTO usuarios (nombre_completo, usuario, contrasena, rol_id, estado) 
-        VALUES (:nombre, :usuario, :contrasena, :rol_id, :estado)";
+            VALUES (:nombre, :usuario, :contrasena, :rol_id, :estado)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':nombre', $nombre);
     $stmt->bindParam(':usuario', $usuarioNuevo);
@@ -51,10 +43,16 @@ try {
     $stmt->bindParam(':estado', $data['estado'], PDO::PARAM_BOOL);
 
     if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Usuario creado con éxito"]);
+        $nuevoId = $pdo->lastInsertId();
+        echo json_encode([
+            "success" => true,
+            "message" => "Usuario creado con éxito",
+            "id" => $nuevoId 
+        ]);
     } else {
         echo json_encode(["success" => false, "message" => "Error al crear usuario"]);
     }
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
 }
+ 

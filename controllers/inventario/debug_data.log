@@ -1,5 +1,6 @@
 Array
 (
+<<<<<<< HEAD
     [codigo] => PRUEBAS
     [nombre] => PRUEBAS
     [dependencia] => PRUEBAS
@@ -10,6 +11,18 @@ Array
     [sede_id] => 3
     [codigo_barras] => PRUEBAS
     [grupo] => PRUEBAS
+=======
+    [codigo] => ME0100
+    [nombre] => SILLA CON RODACHINES NEGRA
+    [dependencia] => SALA DE ADMINISTRACIÓN DE MEDICAMENTOS 
+    [responsable] => 
+    [marca] => 
+    [modelo] => 
+    [serial] => 
+    [sede_id] => 1
+    [codigo_barras] => 
+    [grupo] => 
+>>>>>>> compras
     [vida_util] => 
     [vida_util_niff] => 
     [centro_costo] => 

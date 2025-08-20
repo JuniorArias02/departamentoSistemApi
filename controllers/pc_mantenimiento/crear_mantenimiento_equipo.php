@@ -23,13 +23,7 @@ $requeridos = [
     "descripcion",
     "fecha",
     "empresa_responsable_id",
-    "repuesto",
-    "cantidad_repuesto",
-    "costo_repuesto",
-    "nombre_repuesto",
-    "responsable_mantenimiento",
-    "firma_personal_cargo",
-    "firma_sistemas"
+    "responsable_mantenimiento"
 ];
 
 $faltantes = [];
@@ -55,29 +49,29 @@ try {
             equipo_id, tipo_mantenimiento, descripcion, fecha,
             empresa_responsable_id, repuesto, cantidad_repuesto,
             costo_repuesto, nombre_repuesto, responsable_mantenimiento,
-            firma_personal_cargo, firma_sistemas
+            creado_por, fecha_creacion
         ) VALUES (
             :equipo_id, :tipo_mantenimiento, :descripcion, :fecha,
             :empresa_responsable_id, :repuesto, :cantidad_repuesto,
             :costo_repuesto, :nombre_repuesto, :responsable_mantenimiento,
-            :firma_personal_cargo, :firma_sistemas
+            :creado_por, NOW()
         )
     ");
 
     $stmt->execute([
-        "equipo_id"               => $data["equipo_id"],
-        "tipo_mantenimiento"      => $data["tipo_mantenimiento"],
-        "descripcion"             => $data["descripcion"],
-        "fecha"                   => $data["fecha"],
-        "empresa_responsable_id"  => $data["empresa_responsable_id"],
-        "repuesto"                => $data["repuesto"],
-        "cantidad_repuesto"       => $data["cantidad_repuesto"],
-        "costo_repuesto"          => $data["costo_repuesto"],
-        "nombre_repuesto"         => $data["nombre_repuesto"],
+        "equipo_id"                 => $data["equipo_id"],
+        "tipo_mantenimiento"        => $data["tipo_mantenimiento"],
+        "descripcion"               => $data["descripcion"],
+        "fecha"                     => $data["fecha"],
+        "empresa_responsable_id"    => $data["empresa_responsable_id"],
+        "repuesto"                  => !empty($data["repuesto"]) ? 1 : 0,
+        "cantidad_repuesto"         => ($data["cantidad_repuesto"] === "" || $data["cantidad_repuesto"] === null) ? 0 : (int)$data["cantidad_repuesto"],
+        "costo_repuesto"            => ($data["costo_repuesto"] === "" || $data["costo_repuesto"] === null) ? 0 : (int)$data["costo_repuesto"],
+        "nombre_repuesto"           => $data["nombre_repuesto"] ?: null,
         "responsable_mantenimiento" => $data["responsable_mantenimiento"],
-        "firma_personal_cargo"    => $data["firma_personal_cargo"],
-        "firma_sistemas"          => $data["firma_sistemas"]
+        "creado_por"                => $usuario_id
     ]);
+
 
     $mantenimiento_id = $pdo->lastInsertId();
 
@@ -85,7 +79,8 @@ try {
 
     echo json_encode([
         "status" => true,
-        "message" => "Mantenimiento registrado correctamente"
+        "message" => "Mantenimiento registrado correctamente",
+        "mantenimiento_id" => $mantenimiento_id
     ]);
 } catch (PDOException $e) {
     echo json_encode([

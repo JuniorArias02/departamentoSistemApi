@@ -141,17 +141,20 @@ try {
             "data" => $registro
         ]);
     } else {
-        // Verificar si el código ya existe
-        $verificar = $pdo->prepare("SELECT id FROM inventario WHERE codigo = :codigo");
-        $verificar->execute(["codigo" => $data["codigo"]]);
-        if ($verificar->fetch()) {
-            http_response_code(400);
-            echo json_encode([
-                "success" => false,
-                "message" => "Ya existe un inventario con el código '{$data["codigo"]}'."
-            ]);
-            exit();
+        // Verificar si el código ya existe, excepto si es "N/A"
+        if (strtoupper(trim($data["codigo"])) !== "N/A") {
+            $verificar = $pdo->prepare("SELECT id FROM inventario WHERE codigo = :codigo");
+            $verificar->execute(["codigo" => $data["codigo"]]);
+            if ($verificar->fetch()) {
+                http_response_code(400);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Ya existe un inventario con el código '{$data["codigo"]}'."
+                ]);
+                exit();
+            }
         }
+
         // CREAR NUEVO INVENTARIO
         $stmt = $pdo->prepare("INSERT INTO inventario 
             (codigo, nombre, dependencia, responsable, marca, modelo, serial, sede_id, creado_por,

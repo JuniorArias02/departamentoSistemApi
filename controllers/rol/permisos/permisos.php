@@ -39,12 +39,14 @@ const PERMISOS = [
         'ELIMINAR' => 'eliminar_mantenimiento',
         'VER_TODOS' => 'ver_todos_mantenimientos',
         'VER_TODOS_AGENDADOS' => 'ver_todos_eventos_agendados',
+        'VER_TODOS_EVENTOS_AGENDADOS' => 'ver_todos_eventos_agendados',
         'VER_PROPIOS' => 'ver_propios_mantenimientos',
         'CONTAR_TODOS_PENDIENTES' => 'contar_todos_pendientes_mantenimientos',
         'CONTAR_PROPIOS_PENDIENTES' => 'contar_propios_pendientes_mantenimientos',
         'EXPORTAR_TODOS' => 'exportar_todos_informes_mantenimientos',
         'EXPORTAR_PROPIOS' => 'exportar_propios_informes_mantenimientos',
         'EXPORTAR_ASIGNADOS' => 'exportar_informes_asignados_mantenimientos',
+        'GRAFICAR_MANTENIMIENTO_PROPIA_SEDE' => 'graficar_mantenimiento_propia_sede',
 
     ],
     'AGENDAMIENTO_MANTENIMIENTOS' => [
@@ -69,6 +71,7 @@ const PERMISOS = [
         'EDITAR' => 'editar_inventario',
         'ELIMINAR' => 'eliminar_inventario',
         'EXPORTAR' => 'exportar_inventario',
+        'GRAFICAR_INVENTARIO_PROPIA_SEDE' => 'graficar_inventario_propia_sede',
     ],
 
 
@@ -82,5 +85,13 @@ const PERMISOS = [
     // QUIPOS DE COMPUTO
     'GESTION_EQUIPOS' => [
         'ELIMINAR' => 'eliminar_equipo',
+    ],
+
+    'GESTION_COMPRA_PEDIDOS' => [
+        'RECIBIR_NUEVOS_PEDIDOS' => 'recibir_correo_nuevos_pedidos',
+        'VER_PEDIDOS_PROPIOS' => 'ver_pedidos_propios',
+        'VER_PEDIDOS_ENCARGADO' => 'ver_pedidos_encargado',
+        'RECHAZAR_PEDIDO' => 'rechazar_pedido',
+        'APROBAR_PEDIDO' => 'aprobar_pedido'
     ],
 ];
