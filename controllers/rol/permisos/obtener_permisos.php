@@ -3,7 +3,7 @@ require_once '../../../database/conexion.php';
 require_once __DIR__ . '/../../../middlewares/headers_getPost.php';
 
 // Consulta para obtener todos los permisos
-$sql = "SELECT id, nombre FROM permisos ORDER BY nombre";
+$sql = "SELECT id, nombre, descripcion FROM permisos ORDER BY nombre";
 
 try {
   $stmt = $pdo->query($sql);

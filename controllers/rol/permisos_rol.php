@@ -12,7 +12,7 @@ try {
     $rol_id = $_GET['rol_id'];
     
     $stmt = $pdo->prepare("
-        SELECT p.id, p.nombre, 
+        SELECT p.id, p.nombre, p.descripcion, 
                EXISTS(SELECT 1 FROM rol_permisos rp WHERE rp.rol_id = ? AND rp.permiso_id = p.id) as asignado
         FROM permisos p
         ORDER BY p.nombre
