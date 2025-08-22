@@ -18,7 +18,7 @@ if (!$usuario_id) {
 }
 
 // Validar campos requeridos
-$requeridos = ["nombre", "cedula", "telefono", "cargo", "proceso"];
+$requeridos = ["nombre"];
 $faltantes = [];
 
 foreach ($requeridos as $campo) {
