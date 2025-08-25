@@ -61,6 +61,7 @@ try {
         "status" => true,
         "message" => "Personal registrado correctamente"
     ]);
+    
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,

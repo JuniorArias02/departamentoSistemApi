@@ -25,7 +25,7 @@ $resultado = [];
 
 if (isset($_FILES["firma_digital"]) && $_FILES["firma_digital"]["error"] === UPLOAD_ERR_OK) {
     $extension = strtolower(pathinfo($_FILES["firma_digital"]["name"], PATHINFO_EXTENSION));
-
+ 
     if (!in_array($extension, $ext_permitidas)) {
         $resultado = ["status" => false, "error" => "Formato no permitido"];
     } else {
@@ -52,7 +52,8 @@ if (isset($_FILES["firma_digital"]) && $_FILES["firma_digital"]["error"] === UPL
 }
 
 echo json_encode([
-    "status" => true,
-    "message" => "Proceso completado",
+    "status" => $resultado["status"],
+    "message" => $resultado["status"] ? "Proceso completado" : "Error en el proceso",
     "resultado" => $resultado
 ]);
+
