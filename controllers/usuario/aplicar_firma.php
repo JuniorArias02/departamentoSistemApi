@@ -2,8 +2,14 @@
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 
+// Leer cuerpo JSON
+$data = json_decode(file_get_contents("php://input"), true);
+
+$usuario_id = intval($data["usuario_id"] ?? 0);
+$contrasena = $data["contrasena"] ?? null;
+
 // Validar parámetros
-if (!isset($_POST["usuario_id"]) || !isset($_POST["contrasena"])) {
+if (!$usuario_id || !$contrasena) {
     echo json_encode([
         "status" => false,
         "message" => "Faltan datos (usuario_id o contrasena)"
@@ -11,11 +17,10 @@ if (!isset($_POST["usuario_id"]) || !isset($_POST["contrasena"])) {
     exit;
 }
 
-$usuario_id = intval($_POST["usuario_id"]);
-$contrasena = $_POST["contrasena"];
-
 // Buscar usuario
-$stmt = $pdo->prepare("SELECT contrasena, firma_digital FROM usuarios WHERE id = :id AND estado = 1");
+$stmt = $pdo->prepare("SELECT contrasena, firma_digital 
+                       FROM usuarios 
+                       WHERE id = :id AND estado = 1");
 $stmt->execute(["id" => $usuario_id]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
