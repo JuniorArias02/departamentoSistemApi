@@ -2,15 +2,13 @@
 require_once '../../../database/conexion.php';
 require_once __DIR__ . '/../../../middlewares/headers_post.php';
 
-
 try {
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (
         !isset($data['id']) || 
         !isset($data['nombre_completo']) ||
-        !isset($data['correo']) ||
-        !isset($data['telefono'])
+        !isset($data['correo'])
     ) {
         http_response_code(400);
         echo json_encode([
@@ -23,10 +21,12 @@ try {
     $id = filter_var($data['id'], FILTER_VALIDATE_INT);
     $nombre = trim($data['nombre_completo']);
     $correo = trim($data['correo']);
-    $telefono = trim($data['telefono']);
+    $telefono = isset($data['telefono']) ? trim($data['telefono']) : null;
 
     $sql = "UPDATE usuarios 
-            SET nombre_completo = :nombre, correo = :correo, telefono = :telefono 
+            SET nombre_completo = :nombre, 
+                correo = :correo, 
+                telefono = :telefono 
             WHERE id = :id";
 
     $stmt = $pdo->prepare($sql);
