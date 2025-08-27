@@ -5,6 +5,7 @@ require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
 require_once __DIR__ . '/../../notificaciones/enviarCorreoNuevoPedido.php';
+require_once __DIR__ . '/../notif_notificaciones/notificarNuevoPedidoCompras.php';
 
 // Leer el JSON
 $data = json_decode(file_get_contents("php://input"), true);
@@ -14,23 +15,6 @@ if (!$data) {
     echo json_encode(["error" => "Datos inválidos"]);
     exit;
 }
-
-// Clave exacta del permiso según tu definición de PERMISOS
-$permisoClave = PERMISOS['GESTION_COMPRA_PEDIDOS']['RECIBIR_NUEVOS_PEDIDOS'];
-
-// Obtener usuarios con el permiso
-$sqlUsuarios = " 
-    SELECT u.id, u.nombre_completo, u.correo 
-    FROM usuarios u
-    INNER JOIN rol r ON r.id = u.rol_id
-    INNER JOIN rol_permisos rp ON rp.rol_id = r.id
-    INNER JOIN permisos p ON p.id = rp.permiso_id
-    WHERE p.nombre = :permiso
-      AND u.estado = 1
-";
-$stmtUsuarios = $pdo->prepare($sqlUsuarios);
-$stmtUsuarios->execute(['permiso' => $permisoClave]);
-$usuariosConPermiso = $stmtUsuarios->fetchAll(PDO::FETCH_ASSOC);
 
 // Validar campos obligatorios
 $campos_obligatorios = [
@@ -88,31 +72,42 @@ try {
         $pedido_id
     );
 
+    notificarNuevoPedidoCompras(
+        $pdo,
+        $data['fecha_solicitud'],
+        $data['proceso_solicitante'],
+        $data['tipo_solicitud'],
+        $data['observacion'],
+        $consecutivo
+    );
+    
+    // Buscar correo y nombre del creador
+    $stmtCreador = $pdo->prepare("SELECT nombre_completo, correo FROM usuarios WHERE id = :id LIMIT 1");
+    $stmtCreador->execute([':id' => $data['creador_por']]);
+    $creador = $stmtCreador->fetch(PDO::FETCH_ASSOC);
 
-
-    echo json_encode([
-        "success" => true,
-        "message" => "Pedido creado y notificaciones enviadas",
-        "id" => $pedido_id,
-        "consecutivo" => $consecutivo
-    ]);
-
-    // Enviar notificación a cada usuario con el permiso
-    try {
-        foreach ($usuariosConPermiso as $usuario) {
+    if ($creador) {
+        try {
             enviarCorreoNuevoPedido(
-                $usuario['correo'],
-                $usuario['nombre_completo'],
+                $creador['correo'],
+                $creador['nombre_completo'],
                 $data['fecha_solicitud'],
                 $data['proceso_solicitante'],
                 $data['tipo_solicitud'],
                 $data['observacion'],
                 $consecutivo
             );
+        } catch (Exception $e) {
+            error_log("Error enviando correo al creador: " . $e->getMessage());
         }
-    } catch (Exception $e) {
-        error_log("Error enviando correo de nuevo pedido: " . $e->getMessage());
     }
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Pedido creado y correo enviado al creador",
+        "id" => $pedido_id,
+        "consecutivo" => $consecutivo
+    ]);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["error" => "Error al crear el pedido: " . $e->getMessage()]);

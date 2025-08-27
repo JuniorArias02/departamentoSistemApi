@@ -5,7 +5,7 @@ require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
 require_once __DIR__ . '/../../notificaciones/enviarCorreoAprobadoPedido.php';
-require_once __DIR__ . '/../../notificaciones/enviarCorreoNuevoPedido.php';
+require_once __DIR__ . '/../notif_notificaciones/notificarNuevoPedidoGerenteComercial.php';
 
 // Leer el JSON
 $data = json_decode(file_get_contents("php://input"), true);
@@ -115,33 +115,14 @@ try {
 
     // Enviar correo a todos los usuarios con el permiso VER_PEDIDOS_ENCARGADO
     if ($tipoAprobacion === 'compra') {
-        $sqlUsuariosConPermiso = "
-        SELECT u.correo, u.nombre_completo
-        FROM usuarios u
-        INNER JOIN rol r ON r.id = u.rol_id
-        INNER JOIN rol_permisos rp ON rp.rol_id = r.id
-        INNER JOIN permisos p ON p.id = rp.permiso_id
-        WHERE p.nombre = :permiso
-          AND u.estado = 1
-    ";
-
-        $stmtUsuarios = $pdo->prepare($sqlUsuariosConPermiso);
-        $stmtUsuarios->execute([
-            ':permiso' => PERMISOS['GESTION_COMPRA_PEDIDOS']['VER_PEDIDOS_ENCARGADO']
-        ]);
-        $usuariosConPermiso = $stmtUsuarios->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($usuariosConPermiso as $usuario) {
-            enviarCorreoNuevoPedido(
-                $usuario['correo'],
-                $usuario['nombre_completo'],
-                $pedido['fecha_solicitud'],
-                $pedido['proceso_solicitante'],
-                $pedido['tipo_solicitud'],
-                $pedido['observacion'] ?? '',
-                $pedido['consecutivo']
-            );
-        }
+        notificarNuevoPedidoGerenteComercial(
+            $pdo,
+            $pedido['fecha_solicitud'],
+            $pedido['proceso_solicitante'],
+            $pedido['tipo_solicitud'],
+            $pedido['observacion'] ?? '',
+            $pedido['consecutivo']
+        );
     }
 
 

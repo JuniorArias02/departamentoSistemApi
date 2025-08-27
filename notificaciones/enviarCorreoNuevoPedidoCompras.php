@@ -9,8 +9,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-function enviarCorreoNuevoPedido($paraCorreo, $nombreUsuario, $fechaSolicitud, $procesoSolicitante, $tipoSolicitud, $observacion, $consecutivo = null)
-{
+// esta funcion es para enviar correo las personas que tiene permiso de gestionar el pedido
+function enviarCorreoNuevoPedidoCompras(
+    $paraCorreo,
+    $nombreUsuario,
+    $fechaSolicitud,
+    $procesoSolicitante,
+    $tipoSolicitud,
+    $observacion,
+    $consecutivo = null
+) {
     $mail = new PHPMailer(true);
 
     try {
@@ -52,7 +60,7 @@ function enviarCorreoNuevoPedido($paraCorreo, $nombreUsuario, $fechaSolicitud, $
 
         // Contenido del correo
         $mail->isHTML(true);
-        $mail->Subject = '✨ Nuevo Pedido ' . ($consecutivo ? "#$consecutivo" : '');
+        $mail->Subject = '📩 Nuevo Pedido para Radicar ' . ($consecutivo ? "#$consecutivo" : '');
 
         $mail->Body = <<<HTML
 <!DOCTYPE html>
@@ -62,41 +70,30 @@ function enviarCorreoNuevoPedido($paraCorreo, $nombreUsuario, $fechaSolicitud, $
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nuevo Pedido</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Poppins', sans-serif; line-height: 1.6; color: #374151; background-color: #f3f4f6; margin: 0; padding: 0; }
     .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-    .header { background: linear-gradient(135deg, #1e40af, #1e3a8a); color: white; padding: 30px; text-align: center; position: relative; }
-    .header-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('https://departamento-sistemasips.vercel.app/android-chrome-512x512.png') no-repeat center right -50px; background-size: 150px; opacity: 0.1; }
-    .header-content { position: relative; z-index: 1; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; }
-    .logo { height: 40px; margin-bottom: 15px; }
+    .header { background: linear-gradient(135deg, #1e40af, #1e3a8a); color: white; padding: 30px; text-align: center; }
     .content { padding: 30px; }
     .badge { display: inline-block; background-color: {$colorTipo}; color: white; font-size: 14px; font-weight: 500; padding: 6px 14px; border-radius: 20px; margin-bottom: 20px; }
-    .card { background: #f8fafc; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 5px solid {$colorTipo}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .card { background: #f8fafc; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 5px solid {$colorTipo}; }
     .detail-grid { display: grid; grid-template-columns: 120px 1fr; gap: 12px; margin-bottom: 12px; }
     .detail-label { font-weight: 500; color: #64748b; }
     .detail-value { font-weight: 500; color: #1e293b; }
     .button-container { text-align: center; margin: 30px 0 20px; }
-    .button { display: inline-block; background: linear-gradient(135deg, #1e40af, #1e3a8a); color: white !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 500; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.3s ease; }
-    .button:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .button { display: inline-block; background: linear-gradient(135deg, #1e40af, #1e3a8a); color: white !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 500; }
     .footer { padding: 20px; text-align: center; color: #64748b; font-size: 12px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
     .observacion { background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 15px; font-style: italic; color: #475569; }
-    @media (max-width: 600px) { .container { margin: 0; border-radius: 0; } .content { padding: 20px; } .detail-grid { grid-template-columns: 1fr; gap: 6px; } .header h1 { font-size: 20px; } }
 </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div class="header-overlay"></div>
-        <div class="header-content">
-            <img src="https://departamento-sistemasips.vercel.app/android-chrome-512x512.png" alt="Logo" class="logo">
-            <h1>Nuevo Pedido Registrado</h1>
-        </div>
+        <h1>📌 Pedido pendiente de radicación</h1>
     </div>
     <div class="content">
         <div class="badge">{$tipoTexto}</div>
         <p>Hola <strong>{$nombreUsuario}</strong>,</p>
-        <p>Se ha registrado un nuevo pedido en el sistema que requiere tu atención:</p>
+        <p>Acabas de recibir una nueva petición de pedido en el sistema para que lo radiques.</p>
         <div class="card">
             <div class="detail-grid">
                 <div class="detail-label">Número:</div>
@@ -116,6 +113,7 @@ function enviarCorreoNuevoPedido($paraCorreo, $nombreUsuario, $fechaSolicitud, $
             </div>
             {$htmlObservacion}
         </div>
+       
         <p style="margin-top: 10px; color: #64748b; font-size: 14px; text-align: center;">
             Este es un mensaje automático. Por favor no respondas directamente a este correo.
         </p>
