@@ -63,6 +63,25 @@ try {
 
     $pedido_id = $pdo->lastInsertId();
 
+    $sqlPedido = "
+    SELECT p.fecha_solicitud, 
+           p.proceso_solicitante, 
+           ts.nombre AS nombre_tipo,
+           p.consecutivo,
+           p.observacion,
+           u.nombre_completo, 
+           u.correo
+    FROM cp_pedidos p
+    JOIN usuarios u ON u.id = p.creador_por
+    LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
+    WHERE p.id = :id
+    LIMIT 1
+";
+    $stmtPedido = $pdo->prepare($sqlPedido);
+    $stmtPedido->execute([':id' => $pedido_id]);
+    $pedido = $stmtPedido->fetch(PDO::FETCH_ASSOC);
+
+
     // Registrar actividad
     registrarActividad(
         $pdo,
@@ -74,13 +93,14 @@ try {
 
     notificarNuevoPedidoCompras(
         $pdo,
-        $data['fecha_solicitud'],
-        $data['proceso_solicitante'],
-        $data['tipo_solicitud'],
-        $data['observacion'],
-        $consecutivo
+        $pedido['fecha_solicitud'],       // en vez de $data
+        $pedido['proceso_solicitante'],
+        $pedido['nombre_tipo'],           // aquí el nombre real
+        $pedido['observacion'],
+        $pedido['consecutivo']
     );
-    
+
+
     // Buscar correo y nombre del creador
     $stmtCreador = $pdo->prepare("SELECT nombre_completo, correo FROM usuarios WHERE id = :id LIMIT 1");
     $stmtCreador->execute([':id' => $data['creador_por']]);
@@ -91,11 +111,11 @@ try {
             enviarCorreoNuevoPedido(
                 $creador['correo'],
                 $creador['nombre_completo'],
-                $data['fecha_solicitud'],
-                $data['proceso_solicitante'],
-                $data['tipo_solicitud'],
-                $data['observacion'],
-                $consecutivo
+                $pedido['fecha_solicitud'],       // en vez de $data
+                $pedido['proceso_solicitante'],
+                $pedido['nombre_tipo'],           // aquí también
+                $pedido['observacion'],
+                $pedido['consecutivo']
             );
         } catch (Exception $e) {
             error_log("Error enviando correo al creador: " . $e->getMessage());

@@ -78,13 +78,20 @@ try {
     ]);
     // Obtener datos del pedido para el correo
     $sqlPedido = "
-        SELECT fecha_solicitud, proceso_solicitante, tipo_solicitud, consecutivo
-        FROM cp_pedidos
-        WHERE id = :id_pedido
-    ";
+    SELECT p.fecha_solicitud, 
+           p.proceso_solicitante, 
+           p.tipo_solicitud, 
+           ts.nombre AS nombre_tipo, 
+           p.consecutivo, 
+           p.observacion
+    FROM cp_pedidos p
+    LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
+    WHERE p.id = :id_pedido
+";
     $stmtPedido = $pdo->prepare($sqlPedido);
     $stmtPedido->execute([':id_pedido' => $data['id_pedido']]);
     $pedido = $stmtPedido->fetch(PDO::FETCH_ASSOC);
+
 
     if (!$pedido) {
         http_response_code(404);
@@ -107,8 +114,8 @@ try {
             $usuarioCreador['nombre_completo'],
             $pedido['fecha_solicitud'],
             $pedido['proceso_solicitante'],
-            $pedido['tipo_solicitud'],
-            "",
+            $pedido['nombre_tipo'],
+            $pedido['observacion'] ?? '',
             $pedido['consecutivo']
         );
     }
@@ -119,7 +126,7 @@ try {
             $pdo,
             $pedido['fecha_solicitud'],
             $pedido['proceso_solicitante'],
-            $pedido['tipo_solicitud'],
+            $pedido['nombre_tipo'],
             $pedido['observacion'] ?? '',
             $pedido['consecutivo']
         );

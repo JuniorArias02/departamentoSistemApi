@@ -38,12 +38,13 @@ function enviarCorreoRechazoPedido(
         $mail->Encoding = 'base64';
 
         // Tipo de solicitud y colores
-        $tipoTexto = [
-            '1' => 'Recurrente',
-            '2' => 'Prioritaria'
-        ][$tipoSolicitud] ?? 'No especificado';
+        $tipoTexto = htmlspecialchars($tipoSolicitud);
+        $colorTipo = match (strtolower($tipoTexto)) {
+            'Prioritaria' => '#EF4444',   // rojo
+            'Recurrente'     => '#F59E0B',   // naranja
+            default       => '#3B82F6',   // azul
+        };
 
-        $colorTipo = $tipoSolicitud == '2' ? '#EF4444' : '#3B82F6';
         $numeroPedido = $consecutivo ? "#$consecutivo" : 'N/A';
         $appUrl = $_ENV['APP_URL'] ?? 'https://departamento-sistemasips.vercel.app/dashboard/compras';
 
@@ -123,9 +124,7 @@ function enviarCorreoRechazoPedido(
             </div>
             {$htmlObservacion}
         </div>
-        <div class="button-container">
-            <a href="{$appUrl}" class="button">Ver Detalles del Pedido</a>
-        </div>
+      
         <p style="margin-top: 10px; color: #64748b; font-size: 14px; text-align: center;">
             Este es un mensaje automático. Por favor no respondas directamente a este correo.
         </p>

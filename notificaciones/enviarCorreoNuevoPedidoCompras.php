@@ -39,12 +39,14 @@ function enviarCorreoNuevoPedidoCompras(
         $mail->Encoding = 'base64';
 
         // Datos base
-        $tipoTexto = [
-            '1' => 'Recurrente',
-            '2' => 'Prioritaria'
-        ][$tipoSolicitud] ?? 'No especificado';
+        $tipoTexto = htmlspecialchars($tipoSolicitud);
+        $colorTipo = match (strtolower($tipoTexto)) {
+            'Prioritaria' => '#EF4444',   // rojo
+            'Recurrente'     => '#F59E0B',   // naranja
+            default       => '#3B82F6',   // azul
+        };
 
-        $colorTipo = $tipoSolicitud == '2' ? '#EF4444' : '#3B82F6';
+
         $numeroPedido = $consecutivo ? "#$consecutivo" : 'Nuevo';
         $appUrl = $_ENV['APP_URL'] ?? 'https://departamento-sistemasips.vercel.app/dashboard/compras';
 

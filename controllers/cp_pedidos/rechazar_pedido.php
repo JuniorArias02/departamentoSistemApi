@@ -53,6 +53,7 @@ try {
         observacion_diligenciado = :observacion_diligenciado
     WHERE id = :id_pedido
 ";
+
     $stmtUpdate = $pdo->prepare($sqlUpdate);
     $stmtUpdate->execute([
         ':estado' => 'rechazado',
@@ -62,11 +63,16 @@ try {
 
     // Obtener datos del pedido para el correo
     $sqlPedido = "
-    SELECT p.fecha_solicitud, p.proceso_solicitante, p.tipo_solicitud, p.consecutivo,
-           p.observacion_diligenciado, u.nombre_completo, u.correo
+    SELECT p.fecha_solicitud, 
+           p.proceso_solicitante, 
+           ts.nombre AS nombre_tipo,   -- 👈 traes el nombre
+           p.consecutivo,
+           p.observacion_diligenciado, 
+           u.nombre_completo, 
+           u.correo
     FROM cp_pedidos AS p
-    JOIN usuarios AS u
-        ON p.creador_por = u.id
+    JOIN usuarios AS u ON p.creador_por = u.id
+    LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
     WHERE p.id = :id_pedido
 ";
     $stmtPedido = $pdo->prepare($sqlPedido);
@@ -94,7 +100,7 @@ try {
         $pedido['nombre_completo'],
         $pedido['fecha_solicitud'],
         $pedido['proceso_solicitante'],
-        $pedido['tipo_solicitud'],
+        $pedido['nombre_tipo'],
         $pedido['observacion_diligenciado'],
         $pedido['consecutivo']
     );
