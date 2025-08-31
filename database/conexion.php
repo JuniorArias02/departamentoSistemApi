@@ -8,7 +8,8 @@ try {
         $config['pass']
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->exec("SET time_zone = '-05:00'");
+
 } catch (PDOException $e) {
     die("Error de conexion: " . $e->getMessage());
 }
- 
