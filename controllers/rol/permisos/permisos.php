@@ -96,4 +96,8 @@ const PERMISOS = [
         'APROBAR_PEDIDO' => 'aprobar_pedido',
         'CREAR_PEDIDO' => 'crear_pedido',
     ],
+
+    'REPORTES' => [
+        'RECIBIR_REPORTES' => 'recibir_reportes',
+    ]
 ];
