@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../../middlewares/cors.php';
 
 try {
     $stmt = $pdo->query("SELECT id, nombre, nit, telefono, correo, direccion FROM cp_proveedores ORDER BY nombre ASC");

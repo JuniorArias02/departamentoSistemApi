@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_put.php';
+require_once __DIR__ . '/../../middlewares/cors.php';
 
 try {
     // Recibir JSON desde el frontend
