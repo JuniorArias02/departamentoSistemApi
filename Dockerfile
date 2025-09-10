@@ -10,6 +10,7 @@ COPY . .
 # Instalar dependencias con composer si usas dotenv o algo extra
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd
 
 # Exponer puerto (Railway usa $PORT)
 EXPOSE 8080
