@@ -35,6 +35,7 @@ try {
             p.fecha_solicitud,
             p.proceso_solicitante,
             p.tipo_solicitud,
+            s.nombre AS sede_nombre,
             ts.nombre AS tipo_solicitud_nombre,
             p.consecutivo,
             p.observacion,
@@ -58,6 +59,7 @@ try {
         LEFT JOIN usuarios u3 ON p.responsable_aprobacion = u3.id
         LEFT JOIN usuarios u4 ON p.creador_por = u4.id
         LEFT JOIN cp_tipo_solicitud ts ON p.tipo_solicitud = ts.id
+        LEFT JOIN sedes s ON p.sede_id = s.id
     ";
 
     // Construir filtros según permisos

@@ -1,14 +1,10 @@
 <?php
 require_once '../vendor/autoload.php';
+require_once '../middlewares/headers_post.php';
 require_once '../database/conexion.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-// Headers
-header("Access-Control-Allow-Origin: https://departamento-sistemasips.vercel.app");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

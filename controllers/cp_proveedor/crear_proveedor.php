@@ -3,7 +3,6 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 
 try {
-    // Recibir JSON desde el frontend
     $data = json_decode(file_get_contents("php://input"), true);
 
     // Validar datos obligatorios
@@ -40,9 +39,17 @@ try {
     // Respuesta
     echo json_encode([
         "success" => true,
-        "message" => "Proveedor creado correctamente",
-        "id"      => $pdo->lastInsertId()
+        "data" => [
+            "id"        => $pdo->lastInsertId(),
+            "nombre"    => $data['nombre'],
+            "nit"       => $data['nit'],
+            "telefono"  => $data['telefono'],
+            "correo"    => $data['correo'],
+            "direccion" => $data['direccion']
+        ]
     ]);
+    
+    
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

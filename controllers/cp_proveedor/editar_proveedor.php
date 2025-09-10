@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../../middlewares/headers_put.php';
 
 try {
     // Recibir JSON desde el frontend
@@ -41,7 +41,15 @@ try {
     if ($stmt->rowCount() > 0) {
         echo json_encode([
             "success" => true,
-            "message" => "Proveedor actualizado correctamente"
+            "message" => "Proveedor actualizado correctamente",
+            "data" => [
+                "id"        => $data['proveedor_id'],
+                "nombre"    => $data['nombre'],
+                "nit"       => $data['nit'],
+                "telefono"  => $data['telefono'],
+                "correo"    => $data['correo'],
+                "direccion" => $data['direccion']
+            ]
         ]);
     } else {
         echo json_encode([
@@ -49,6 +57,7 @@ try {
             "message" => "No se actualizó el proveedor (quizá los datos son iguales)"
         ]);
     }
+    
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

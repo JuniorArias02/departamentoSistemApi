@@ -22,6 +22,7 @@ $campos_obligatorios = [
     'proceso_solicitante',
     'tipo_solicitud',
     'observacion',
+    'sede_id',
     'elaborado_por',
     'creador_por'
 ];
@@ -42,12 +43,12 @@ try {
     // Insertar pedido
     $sqlInsert = "INSERT INTO cp_pedidos (
         estado_compras, fecha_solicitud, proceso_solicitante, tipo_solicitud, consecutivo,
-        observacion, elaborado_por, elaborado_por_firma, proceso_compra, proceso_compra_firma,
+        observacion, sede_id, elaborado_por, elaborado_por_firma, proceso_compra, proceso_compra_firma,
         responsable_aprobacion, responsable_aprobacion_firma, creador_por, pedido_visto,
         observacion_diligenciado, estado_gerencia
     ) VALUES (
         'pendiente', :fecha_solicitud, :proceso_solicitante, :tipo_solicitud, :consecutivo,
-        :observacion, :elaborado_por, NULL, NULL, NULL,
+        :observacion, :sede_id,  :elaborado_por, NULL, NULL, NULL,
         NULL, NULL, :creador_por, 0, NULL, 'pendiente'
     )";
     $stmtInsert = $pdo->prepare($sqlInsert);
@@ -57,6 +58,7 @@ try {
         ':tipo_solicitud' => $data['tipo_solicitud'],
         ':consecutivo' => $consecutivo,
         ':observacion' => $data['observacion'],
+        ':sede_id' => $data['sede_id'],
         ':elaborado_por' => $data['elaborado_por'],
         ':creador_por' => $data['creador_por']
     ]);
@@ -93,9 +95,9 @@ try {
 
     notificarNuevoPedidoCompras(
         $pdo,
-        $pedido['fecha_solicitud'],       // en vez de $data
+        $pedido['fecha_solicitud'],
         $pedido['proceso_solicitante'],
-        $pedido['nombre_tipo'],           // aquí el nombre real
+        $pedido['nombre_tipo'],
         $pedido['observacion'],
         $pedido['consecutivo']
     );
@@ -111,9 +113,9 @@ try {
             enviarCorreoNuevoPedido(
                 $creador['correo'],
                 $creador['nombre_completo'],
-                $pedido['fecha_solicitud'],       // en vez de $data
+                $pedido['fecha_solicitud'],
                 $pedido['proceso_solicitante'],
-                $pedido['nombre_tipo'],           // aquí también
+                $pedido['nombre_tipo'],
                 $pedido['observacion'],
                 $pedido['consecutivo']
             );
