@@ -90,7 +90,7 @@ try {
     // Obtener items por pedido
     foreach ($pedidos as &$pedido) {
         $stmtItems = $pdo->prepare("
-            SELECT id, nombre, cantidad, referencia_items 
+            SELECT id, nombre, cantidad,unidad_medida, referencia_items 
             FROM cp_items_pedidos 
             WHERE cp_pedido = :id
         ");
@@ -102,7 +102,6 @@ try {
         "success" => true,
         "data" => $pedidos
     ]);
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

@@ -10,18 +10,19 @@ try {
         exit;
     }
 
-    $sql = "INSERT INTO cp_items_pedidos (nombre, cantidad, referencia_items, cp_pedido) 
-            VALUES (:nombre, :cantidad, :referencia_items, :cp_pedido)";
+    $sql = "INSERT INTO cp_items_pedidos (nombre, cantidad,unidad_medida, referencia_items, cp_pedido) 
+            VALUES (:nombre, :cantidad, :unidad_medida, :referencia_items, :cp_pedido)";
     $stmt = $pdo->prepare($sql);
 
     foreach ($data as $item) {
         if (!isset($item['nombre'], $item['cantidad'], $item['cp_pedido'])) {
-            continue; 
+            continue;
         }
 
         $stmt->execute([
             ':nombre' => $item['nombre'],
             ':cantidad' => $item['cantidad'],
+            ':unidad_medida' => $item['unidad_medida'],
             ':referencia_items' => $item['referencia_items'] ?? null,
             ':cp_pedido' => $item['cp_pedido']
         ]);
