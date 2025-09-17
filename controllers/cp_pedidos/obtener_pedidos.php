@@ -52,7 +52,8 @@ try {
             u4.nombre_completo AS creador_nombre,
             p.pedido_visto,
             p.observacion_diligenciado,
-            p.estado_gerencia
+            p.estado_gerencia,
+            es.estado AS estado_entrega
         FROM cp_pedidos p
         LEFT JOIN usuarios u1 ON p.elaborado_por = u1.id
         LEFT JOIN usuarios u2 ON p.proceso_compra = u2.id
@@ -60,6 +61,7 @@ try {
         LEFT JOIN usuarios u4 ON p.creador_por = u4.id
         LEFT JOIN cp_tipo_solicitud ts ON p.tipo_solicitud = ts.id
         LEFT JOIN sedes s ON p.sede_id = s.id
+        LEFT JOIN cp_entrega_solicitud es ON es.consecutivo_id = p.consecutivo
     ";
 
     // Construir filtros según permisos

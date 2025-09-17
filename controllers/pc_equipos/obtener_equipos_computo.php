@@ -67,7 +67,7 @@ $stmt = $pdo->prepare("
         p.nombre AS responsable_nombre,
         p.cedula AS responsable_cedula,
         p.telefono AS responsable_telefono,
-        p.cargo AS responsable_cargo,
+        ps.nombre AS responsable_cargo,
         p.proceso AS responsable_proceso,
 
         -- Área
@@ -102,6 +102,7 @@ $stmt = $pdo->prepare("
     LEFT JOIN pc_licencias_software l ON e.id = l.equipo_id
     -- 🔹 Join a la tabla de configuración
     LEFT JOIN pc_config_cronograma cc ON 1=1
+    LEFT JOIN p_cargo ps ON p.cargo_id = ps.id
     ORDER BY e.id DESC
 ");
 

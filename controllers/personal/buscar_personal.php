@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_get.php';
+require_once __DIR__ . '/../../middlewares/cors.php';
 
 try {
     $termino = strtolower(trim($_GET['q'] ?? ''));
@@ -10,10 +10,17 @@ try {
         exit;
     }
 
-    $sql = "SELECT id, nombre, cedula, telefono, cargo, proceso
-            FROM personal
-            WHERE LOWER(cedula) LIKE :busqueda
-               OR LOWER(nombre) LIKE :busqueda
+    $sql = "SELECT 
+                p.id, 
+                p.nombre, 
+                p.cedula, 
+                p.telefono, 
+                c.nombre AS cargo,   -- 👈 nombre del cargo
+                p.proceso
+            FROM personal p
+            LEFT JOIN p_cargo c ON p.cargo_id = c.id
+            WHERE LOWER(p.cedula) LIKE :busqueda
+               OR LOWER(p.nombre) LIKE :busqueda
             LIMIT 20";
 
     $stmt = $pdo->prepare($sql);

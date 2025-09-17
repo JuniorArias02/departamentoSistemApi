@@ -21,7 +21,24 @@ if (!file_exists($directorio)) {
 
 $resultados = [];
 
+// 🟢 Consulta si ya existe la firma de sistemas
+$stmtCheckSistemas = $pdo->prepare("SELECT firma_sistemas FROM pc_mantenimientos WHERE id = :id");
+$stmtCheckSistemas->execute(["id" => $mantenimiento_id]);
+$row = $stmtCheckSistemas->fetch(PDO::FETCH_ASSOC);
+
+$firmaSistemasYaExiste = !empty($row["firma_sistemas"]);
+
 foreach (["firma_personal_cargo", "firma_sistemas"] as $campo) {
+    // ⚡ Solo obligamos firma_sistemas si NO existe todavía en BD
+    if ($campo === "firma_sistemas" && !$firmaSistemasYaExiste 
+        && (!isset($_FILES[$campo]) || $_FILES[$campo]['error'] !== UPLOAD_ERR_OK)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "La firma de sistemas es obligatoria porque no existe aún"
+        ]);
+        exit;
+    }
+
     if (isset($_FILES[$campo]) && $_FILES[$campo]['error'] === UPLOAD_ERR_OK) {
         $extension = strtolower(pathinfo($_FILES[$campo]['name'], PATHINFO_EXTENSION));
 
@@ -35,7 +52,6 @@ foreach (["firma_personal_cargo", "firma_sistemas"] as $campo) {
         $ruta_relativa = "public/equipos/" . $nombre_archivo;
 
         if (move_uploaded_file($_FILES[$campo]['tmp_name'], $ruta_absoluta)) {
-            // Guardar en BD
             $stmt = $pdo->prepare("UPDATE pc_mantenimientos SET $campo = :ruta WHERE id = :id");
             $stmt->execute([
                 "ruta" => $ruta_relativa,
@@ -46,13 +62,29 @@ foreach (["firma_personal_cargo", "firma_sistemas"] as $campo) {
         } else {
             $resultados[$campo] = ["status" => false, "error" => "Error al mover el archivo"];
         }
-    } else {
-        $resultados[$campo] = ["status" => false, "error" => "No se recibió archivo"];
     }
 }
+
+// 🔥 Revisamos de nuevo ambas firmas
+$stmtCheck = $pdo->prepare("SELECT firma_personal_cargo, firma_sistemas FROM pc_mantenimientos WHERE id = :id");
+$stmtCheck->execute(["id" => $mantenimiento_id]);
+$firmas = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+if (!empty($firmas["firma_personal_cargo"]) && !empty($firmas["firma_sistemas"])) {
+    $nuevoEstado = "completado";
+} else {
+    $nuevoEstado = "pendiente";
+}
+
+$stmtUpdateEstado = $pdo->prepare("UPDATE pc_mantenimientos SET estado = :estado WHERE id = :id");
+$stmtUpdateEstado->execute([
+    "estado" => $nuevoEstado,
+    "id"     => $mantenimiento_id
+]);
 
 echo json_encode([
     "status" => true,
     "message" => "Proceso completado",
+    "estado" => $nuevoEstado,
     "resultados" => $resultados
 ]);

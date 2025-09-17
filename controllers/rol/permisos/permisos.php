@@ -86,6 +86,7 @@ const PERMISOS = [
     // QUIPOS DE COMPUTO
     'GESTION_EQUIPOS' => [
         'ELIMINAR' => 'eliminar_equipo',
+        'ELIMINAR_ACTA_MANTENIMIENTO' => 'eliminar_acta_mantenimiento'
     ],
 
     'GESTION_COMPRA_PEDIDOS' => [
@@ -95,6 +96,7 @@ const PERMISOS = [
         'RECHAZAR_PEDIDO' => 'rechazar_pedido',
         'APROBAR_PEDIDO' => 'aprobar_pedido',
         'CREAR_PEDIDO' => 'crear_pedido',
+        'CREAR_ENTREGA_SOLICITUD' => 'crear_entrega_solicitud'
     ],
 
     'REPORTES' => [
