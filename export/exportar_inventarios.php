@@ -1,10 +1,8 @@
 <?php
 require_once '../vendor/autoload.php';
 require_once '../database/conexion.php';
+require_once '../middlewares/cors.php';
 
-header("Access-Control-Allow-Origin: https://departamento-sistemasips.vercel.app");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: GET");
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

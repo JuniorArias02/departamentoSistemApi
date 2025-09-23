@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php'; // Aquí tienes $pdo listo
-require_once __DIR__ . '/../../middlewares/headers_post.php'; // Maneja CORS y headers
+require_once __DIR__ . '/../../middlewares/cors.php'; // Maneja CORS y headers
 
 // Leer y decodificar el JSON recibido
 $input = json_decode(file_get_contents("php://input"), true);

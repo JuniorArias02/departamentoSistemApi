@@ -3,10 +3,10 @@ require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/cors.php';
 
 try {
-	// 1. Traer todas las solicitudes de descuento con trabajador
 	$sql = "SELECT 
             d.id,
             d.entrega_fijos_id,
+			d.estado_solicitud,
             d.consecutivo,
             d.fecha_solicitud,
             d.trabajador_id,

@@ -3,7 +3,17 @@ require_once __DIR__ . '/../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 
 try {
-    $stmt = $pdo->prepare("SELECT * FROM personal");
+    $stmt = $pdo->prepare("
+    SELECT
+    p.id,
+    p.nombre,
+    p.cedula,
+    p.proceso,
+    c.nombre as cargo
+    FROM personal as p
+    LEFT JOIN p_cargo as c ON p.cargo_id = c.id
+    
+    ");
     $stmt->execute();
     $personales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

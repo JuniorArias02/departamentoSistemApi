@@ -33,7 +33,7 @@ try {
             p.id,
             p.estado_compras,
             p.fecha_solicitud,
-            p.proceso_solicitante,
+            dp.nombre AS proceso_solicitante,
             p.tipo_solicitud,
             s.nombre AS sede_nombre,
             ts.nombre AS tipo_solicitud_nombre,
@@ -62,6 +62,7 @@ try {
         LEFT JOIN cp_tipo_solicitud ts ON p.tipo_solicitud = ts.id
         LEFT JOIN sedes s ON p.sede_id = s.id
         LEFT JOIN cp_entrega_solicitud es ON es.consecutivo_id = p.consecutivo
+        LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
     ";
 
     // Construir filtros según permisos

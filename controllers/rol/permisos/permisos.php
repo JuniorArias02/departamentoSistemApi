@@ -96,10 +96,12 @@ const PERMISOS = [
         'RECHAZAR_PEDIDO' => 'rechazar_pedido',
         'APROBAR_PEDIDO' => 'aprobar_pedido',
         'CREAR_PEDIDO' => 'crear_pedido',
-        'CREAR_ENTREGA_SOLICITUD' => 'crear_entrega_solicitud'
+        'CREAR_ENTREGA_SOLICITUD' => 'crear_entrega_solicitud',
+        'CREAR_DESCUENTO_FIJOS' => 'crear_descuento_fijos'
     ],
 
     'REPORTES' => [
         'RECIBIR_REPORTES' => 'recibir_reportes',
     ]
+
 ];

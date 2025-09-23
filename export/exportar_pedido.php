@@ -22,7 +22,7 @@ function getPedido($pdo, $idPedido)
         SELECT 
             p.fecha_solicitud AS fecha,
             p.consecutivo,
-			p.proceso_solicitante,
+			dp.nombre AS proceso_solicitante,
             ts.nombre AS tipo_solicitud,
 			s.nombre AS sede,
             p.observacion AS observaciones,
@@ -48,6 +48,7 @@ function getPedido($pdo, $idPedido)
         LEFT JOIN usuarios u_resp ON u_resp.id = p.responsable_aprobacion
         LEFT JOIN rol r_resp ON r_resp.id = u_resp.rol_id
 		LEFT JOIN sedes s ON s.id = p.sede_id
+		LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
         WHERE p.id = :id;
     ";
 	$stmt = $pdo->prepare($sql);

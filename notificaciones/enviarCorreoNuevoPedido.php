@@ -23,7 +23,7 @@ function enviarCorreoNuevoPedido($paraCorreo, $nombreUsuario, $fechaSolicitud, $
         $mail->SMTPSecure = $_ENV['MAIL_ENCRYPTION'];
         $mail->Port       = $_ENV['MAIL_PORT'];
 
-        // Remitente y destinatario
+        // Remitente y destinatario 
         $mail->setFrom($_ENV['MAIL_FROM'], $_ENV['MAIL_NAME']);
         $mail->addAddress($paraCorreo, $nombreUsuario);
 

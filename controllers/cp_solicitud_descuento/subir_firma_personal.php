@@ -19,13 +19,6 @@ if (!isset($_POST['tipo_firma']) || empty($_POST['tipo_firma'])) {
     exit;
 }
 
-if (!isset($_FILES['firma']) || $_FILES['firma']['error'] !== UPLOAD_ERR_OK) {
-    http_response_code(400);
-    echo json_encode(["error" => "La firma es obligatoria"]);
-    exit;
-}
-
-
 $idSolicitud = intval($_POST['id_solicitud']);
 $tipoFirma   = $_POST['tipo_firma'];
 
@@ -42,6 +35,15 @@ $firmasPermitidas = [
 if (!in_array($tipoFirma, $firmasPermitidas)) {
     http_response_code(400);
     echo json_encode(["error" => "Tipo de firma no válido"]);
+    exit;
+}
+
+// Si no llegó firma → no es error, solo avisamos
+if (!isset($_FILES['firma']) || $_FILES['firma']['error'] === UPLOAD_ERR_NO_FILE) {
+    echo json_encode([
+        "success" => false,
+        "message" => "No se seleccionó ninguna firma"
+    ]);
     exit;
 }
 
