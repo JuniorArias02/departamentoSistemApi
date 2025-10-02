@@ -8,6 +8,8 @@ try {
                 m.id,
                 m.equipo_id,
                 e.nombre_equipo,
+                e.numero_inventario,
+                a.nombre AS nombre_area,
                 m.tipo_mantenimiento,
                 m.descripcion,
 				m.estado,
@@ -26,6 +28,7 @@ try {
             FROM pc_mantenimientos m
             INNER JOIN pc_equipos e ON m.equipo_id = e.id
 			INNER JOIN usuarios u ON m.responsable_mantenimiento = u.id
+            INNER JOIN areas a ON e.area_id = a.id
             ORDER BY m.fecha_creacion DESC";
 
     $stmt = $pdo->prepare($sql);
