@@ -1,6 +1,6 @@
 <?php
 require_once '../../database/conexion.php';
-require_once __DIR__ . '/../../middlewares/headers_post.php';
+require_once __DIR__ . '/../../middlewares/cors.php';
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -10,21 +10,25 @@ try {
         exit;
     }
 
-    $sql = "INSERT INTO cp_items_pedidos (nombre, cantidad,unidad_medida, referencia_items, cp_pedido) 
-            VALUES (:nombre, :cantidad, :unidad_medida, :referencia_items, :cp_pedido)";
+    $sql = "INSERT INTO cp_items_pedidos 
+            (nombre, cantidad, unidad_medida, referencia_items, cp_pedido, productos_id) 
+            VALUES 
+            (:nombre, :cantidad, :unidad_medida, :referencia_items, :cp_pedido, :productos_id)";
+
     $stmt = $pdo->prepare($sql);
 
     foreach ($data as $item) {
         if (!isset($item['nombre'], $item['cantidad'], $item['cp_pedido'])) {
-            continue;
+            continue; 
         }
 
         $stmt->execute([
-            ':nombre' => $item['nombre'],
-            ':cantidad' => $item['cantidad'],
-            ':unidad_medida' => $item['unidad_medida'],
+            ':nombre'           => $item['nombre'],
+            ':cantidad'         => $item['cantidad'],
+            ':unidad_medida'    => $item['unidad_medida'] ?? null,
             ':referencia_items' => $item['referencia_items'] ?? null,
-            ':cp_pedido' => $item['cp_pedido']
+            ':cp_pedido'        => $item['cp_pedido'],
+            ':productos_id'     => $item['productos_id'] ?? null 
         ]);
     }
 
