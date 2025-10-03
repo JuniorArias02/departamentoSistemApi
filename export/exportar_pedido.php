@@ -83,8 +83,6 @@ function llenarEncabezado($sheet, $pedido, $extra)
     $sheet->getStyle("E6")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
 
     $sheet->setCellValue("E7", $pedido['proceso_solicitante']);
-    $sheet->getStyle('E7')->getAlignment()->setWrapText(true);
-    $sheet->getRowDimension(7)->setRowHeight(-1);
 
     $sheet->setCellValue("I6", $pedido['consecutivo']);
     $sheet->setCellValue("I7", $pedido['sede']);
@@ -104,7 +102,12 @@ function llenarEncabezado($sheet, $pedido, $extra)
     } else {
         $sheet->setCellValue($obsCell, $pedido['observaciones']);
     }
+
+    
+    $sheet->getStyle($obsCell)->getAlignment()->setWrapText(true);
+    $sheet->getRowDimension($obsRow)->setRowHeight(-1);
 }
+
 
 
 function llenarItems($sheet, $items, $startRow = 13)
