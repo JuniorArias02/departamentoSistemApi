@@ -22,12 +22,12 @@ function getPedido($pdo, $idPedido)
         SELECT 
             p.fecha_solicitud AS fecha,
             p.consecutivo,
-			dp.nombre AS proceso_solicitante,
+            dp.nombre AS proceso_solicitante,
             ts.nombre AS tipo_solicitud,
-			s.nombre AS sede,
+            s.nombre AS sede,
             p.observacion AS observaciones,
-			p.fecha_compra,
-			p.fecha_gerencia,
+            p.fecha_compra,
+            p.fecha_gerencia,
             u_elab.nombre_completo AS elaborado_nombre,
             r_elab.nombre AS elaborado_cargo,
             p.elaborado_por_firma AS elaborado_firma,
@@ -47,8 +47,8 @@ function getPedido($pdo, $idPedido)
         LEFT JOIN rol r_compra ON r_compra.id = u_compra.rol_id
         LEFT JOIN usuarios u_resp ON u_resp.id = p.responsable_aprobacion
         LEFT JOIN rol r_resp ON r_resp.id = u_resp.rol_id
-		LEFT JOIN sedes s ON s.id = p.sede_id
-		LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
+        LEFT JOIN sedes s ON s.id = p.sede_id
+        LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
         WHERE p.id = :id;
     ";
 	$stmt = $pdo->prepare($sql);
@@ -58,12 +58,22 @@ function getPedido($pdo, $idPedido)
 
 function getItems($pdo, $idPedido)
 {
-	$sql = "SELECT nombre, cantidad, referencia_items AS referencia
-            FROM cp_items_pedidos WHERE cp_pedido = :id";
+	$sql = "
+        SELECT 
+            i.nombre,
+            i.cantidad,
+            i.referencia_items AS referencia,
+            i.productos_id,
+            p.codigo AS codigo_producto
+        FROM cp_items_pedidos i
+        LEFT JOIN cp_productos p ON p.id = i.productos_id
+        WHERE i.cp_pedido = :id
+    ";
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute([':id' => $idPedido]);
 	return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 // 2. --- Excel helpers ---
 function llenarEncabezado($sheet, $pedido)
@@ -75,7 +85,6 @@ function llenarEncabezado($sheet, $pedido)
 
 	$sheet->setCellValue("E7", $pedido['proceso_solicitante']);
 	$sheet->setCellValue("I6", $pedido['consecutivo']);
-
 	$sheet->setCellValue("I7", $pedido['sede']);
 
 	if ($pedido['tipo_solicitud'] === "Prioritaria") {
@@ -94,27 +103,28 @@ function llenarEncabezado($sheet, $pedido)
 
 function llenarItems($sheet, $items, $startRow = 13)
 {
-	$count = 0;
+	$count = 0; // sigue contando todos los ítems
 	foreach ($items as $i => $item) {
 		$row = $startRow + $i;
 		$count++;
-		$sheet->setCellValue("B{$row}", $count);
+
+
+		$cellValue = !empty($item['codigo_producto']) ? $item['codigo_producto'] : $count;
+
+		$sheet->setCellValue("B{$row}", $cellValue);
 		$sheet->setCellValue("C{$row}", $item['nombre']);
 		$sheet->setCellValue("I{$row}", "unidades");
 		$sheet->setCellValue("J{$row}", $item['cantidad']);
 	}
 }
 
-
-function responsableProceso($sheet, $pedidos)
+function responsableProceso($sheet, $pedidos, $offset = 0)
 {
-	// Helper para formatear fecha en dd/mm/aaaa
 	$formatFecha = function ($fecha) {
 		if (empty($fecha)) return "";
 		return (new DateTime($fecha))->format("d/m/Y");
 	};
 
-	// Helper para concatenar
 	$concat = function ($cell, $value) use ($sheet) {
 		if (!empty($value)) {
 			$current = $sheet->getCell($cell)->getValue();
@@ -126,21 +136,16 @@ function responsableProceso($sheet, $pedidos)
 		}
 	};
 
-	// Fechas concatenadas como texto
-	$concat("B42", "" . $formatFecha($pedidos['fecha_compra']));
-	$concat("G42", "" . $formatFecha($pedidos['fecha_gerencia']));
-
-	// Nombres y cargos
-	$concat("B33", $pedidos['elaborado_nombre']);
-	$concat("B34", $pedidos['elaborado_cargo']);
-	$concat("B40", $pedidos['proceso_compra_nombre']);
-	$concat("B41", $pedidos['proceso_compra_cargo']);
-	$concat("G40", $pedidos['responsable_nombre']);
-	$concat("G41", $pedidos['responsable_cargo']);
+	// Ajuste con offset en filas
+	$concat("B" . (42 + $offset), "" . $formatFecha($pedidos['fecha_compra']));
+	$concat("G" . (42 + $offset), "" . $formatFecha($pedidos['fecha_gerencia']));
+	$concat("B" . (33 + $offset), $pedidos['elaborado_nombre']);
+	$concat("B" . (34 + $offset), $pedidos['elaborado_cargo']);
+	$concat("B" . (40 + $offset), $pedidos['proceso_compra_nombre']);
+	$concat("B" . (41 + $offset), $pedidos['proceso_compra_cargo']);
+	$concat("G" . (40 + $offset), $pedidos['responsable_nombre']);
+	$concat("G" . (41 + $offset), $pedidos['responsable_cargo']);
 }
-
-
-
 
 function insertarFirma($sheet, $rutaFirma, $celda)
 {
@@ -155,25 +160,22 @@ function insertarFirma($sheet, $rutaFirma, $celda)
 	$drawing->setHeight(75);
 	$drawing->setResizeProportional(true);
 
-
 	$drawing->setOffsetX(65);
 	$drawing->setOffsetY(17);
-
-	// Insertar en hoja
 	$drawing->setWorksheet($sheet);
 
-	// Asegurar que la fila sea suficiente para mostrar la firma
 	preg_match('/([A-Z]+)([0-9]+)/', $celda, $matches);
 	$row = (int)$matches[2];
-	$sheet->getRowDimension($row)->setRowHeight(67); // un poquito más de 2cm
+	$sheet->getRowDimension($row)->setRowHeight(67);
 }
 
-function insertarFirmas($sheet, $pedido)
+function insertarFirmas($sheet, $pedido, $offset = 0)
 {
-	insertarFirma($sheet, $pedido['elaborado_firma'], "B31");
-	insertarFirma($sheet, $pedido['proceso_compra_firma'], "B38");
-	insertarFirma($sheet, $pedido['responsable_firma'], "G38");
+	insertarFirma($sheet, $pedido['elaborado_firma'], "B" . (31 + $offset));
+	insertarFirma($sheet, $pedido['proceso_compra_firma'], "B" . (38 + $offset));
+	insertarFirma($sheet, $pedido['responsable_firma'], "G" . (38 + $offset));
 }
+
 /* ==========================================================
    CONTROLADOR PRINCIPAL
 ========================================================== */
@@ -200,15 +202,63 @@ $templatePath = __DIR__ . "/../public/plantilla_pedidos.xlsx";
 $spreadsheet = IOFactory::load($templatePath);
 $sheet = $spreadsheet->getActiveSheet();
 
+/* =======================
+   Ajuste dinámico de filas
+======================= */
+
+// Detectar si hay más de 12 ítems
+/* =======================
+   Ajuste dinámico de filas
+======================= */
+
+// Detectar si hay más de 12 ítems
+$extra = max(0, count($items) - 12);
+
+// Si hay extra, insertamos filas debajo de la tabla de ítems
+// Suponiendo que la tabla termina en la fila 24
+if ($extra > 0) {
+	$insertStart = 25; // fila donde empiezan firmas
+	$sheet->insertNewRowBefore($insertStart, $extra);
+
+	// 🔥 Combinar y centrar las celdas de las nuevas filas
+	$startRow = 13 + 12;          // fila donde se corta la tabla original
+	$endRow = $startRow + $extra - 1;
+
+	for ($row = $startRow; $row <= $endRow; $row++) {
+		// Combinar celdas para el nombre
+		$sheet->mergeCells("C{$row}:H{$row}");
+		$sheet->mergeCells("J{$row}:K{$row}");
+
+		// Centrar texto
+		$sheet->getStyle("C{$row}:H{$row}")
+			->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+			->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+		$sheet->getStyle("J{$row}:K{$row}")
+			->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+			->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+	}
+}
+
 // Llenar datos
 llenarEncabezado($sheet, $pedido);
 llenarItems($sheet, $items);
-insertarFirmas($sheet, $pedido);
-responsableProceso($sheet, $pedido);
+insertarFirmas($sheet, $pedido, $extra);
+responsableProceso($sheet, $pedido, $extra);
+
 // Exportar
+$proceso = preg_replace('/[^A-Za-z0-9_\-]/', '_', $pedido['proceso_solicitante']);
+$sede    = preg_replace('/[^A-Za-z0-9_\-]/', '_', $pedido['sede']);
+$consecutivo    = preg_replace('/[^A-Za-z0-9_\-]/', '_', $pedido['consecutivo']);
+
+$filename = "PEDIDO_{$proceso}_{$sede}_{$consecutivo}.xlsx";
+
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="pedido.xlsx"');
+header('Content-Disposition: attachment;filename="' . $filename . '"');
+header('Access-Control-Expose-Headers: Content-Disposition');
+
 header('Cache-Control: max-age=0');
+
 
 $writer = new Xlsx($spreadsheet);
 $writer->save("php://output");
