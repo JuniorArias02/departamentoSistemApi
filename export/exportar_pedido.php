@@ -76,38 +76,48 @@ function getItems($pdo, $idPedido)
 
 
 // 2. --- Excel helpers ---
-function llenarEncabezado($sheet, $pedido)
+function llenarEncabezado($sheet, $pedido, $extra)
 {
-	$date = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($pedido['fecha']));
-	$sheet->setCellValue("E6", $date);
+    $date = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($pedido['fecha']));
+    $sheet->setCellValue("E6", $date);
+    $sheet->getStyle("E6")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
 
-	$sheet->getStyle("E6")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+    $sheet->setCellValue("E7", $pedido['proceso_solicitante']);
+    $sheet->getStyle('E7')->getAlignment()->setWrapText(true);
+    $sheet->getRowDimension(7)->setRowHeight(-1);
 
-	$sheet->setCellValue("E7", $pedido['proceso_solicitante']);
-	$sheet->setCellValue("I6", $pedido['consecutivo']);
-	$sheet->setCellValue("I7", $pedido['sede']);
+    $sheet->setCellValue("I6", $pedido['consecutivo']);
+    $sheet->setCellValue("I7", $pedido['sede']);
 
-	if ($pedido['tipo_solicitud'] === "Prioritaria") {
-		$sheet->setCellValue("J9", "X");
-	} elseif ($pedido['tipo_solicitud'] === "Recurrente") {
-		$sheet->setCellValue("G9", "X");
-	}
+    if ($pedido['tipo_solicitud'] === "Prioritaria") {
+        $sheet->setCellValue("J9", "X");
+    } elseif ($pedido['tipo_solicitud'] === "Recurrente") {
+        $sheet->setCellValue("G9", "X");
+    }
 
-	$currentObs = $sheet->getCell("A18")->getValue();
-	if (!empty($currentObs)) {
-		$sheet->setCellValue("A18", $currentObs . " " . $pedido['observaciones']);
-	} else {
-		$sheet->setCellValue("B26", $pedido['observaciones']);
-	}
+    $obsRow  = 26 + $extra;
+    $obsCell = "B{$obsRow}";
+
+    $currentObs = $sheet->getCell($obsCell)->getValue();
+    if (!empty($currentObs)) {
+        $sheet->setCellValue($obsCell, $currentObs . " " . $pedido['observaciones']);
+    } else {
+        $sheet->setCellValue($obsCell, $pedido['observaciones']);
+    }
 }
+
 
 function llenarItems($sheet, $items, $startRow = 13)
 {
-	$count = 0; // sigue contando todos los ítems
+	// 🔥 Auto-ajustar columnas una sola vez
+	foreach (['B', 'C', 'I', 'J'] as $col) {
+		$sheet->getColumnDimension($col)->setAutoSize(true);
+	}
+
+	$count = 0;
 	foreach ($items as $i => $item) {
 		$row = $startRow + $i;
 		$count++;
-
 
 		$cellValue = !empty($item['codigo_producto']) ? $item['codigo_producto'] : $count;
 
@@ -115,6 +125,10 @@ function llenarItems($sheet, $items, $startRow = 13)
 		$sheet->setCellValue("C{$row}", $item['nombre']);
 		$sheet->setCellValue("I{$row}", "unidades");
 		$sheet->setCellValue("J{$row}", $item['cantidad']);
+
+		// 🪄 Ajustes visuales
+		$sheet->getRowDimension($row)->setRowHeight(-1);               // altura automática
+		$sheet->getStyle("C{$row}")->getAlignment()->setWrapText(true); // salto de línea
 	}
 }
 
@@ -202,11 +216,7 @@ $templatePath = __DIR__ . "/../public/plantilla_pedidos.xlsx";
 $spreadsheet = IOFactory::load($templatePath);
 $sheet = $spreadsheet->getActiveSheet();
 
-/* =======================
-   Ajuste dinámico de filas
-======================= */
 
-// Detectar si hay más de 12 ítems
 /* =======================
    Ajuste dinámico de filas
 ======================= */
@@ -215,13 +225,12 @@ $sheet = $spreadsheet->getActiveSheet();
 $extra = max(0, count($items) - 12);
 
 // Si hay extra, insertamos filas debajo de la tabla de ítems
-// Suponiendo que la tabla termina en la fila 24
 if ($extra > 0) {
 	$insertStart = 25; // fila donde empiezan firmas
 	$sheet->insertNewRowBefore($insertStart, $extra);
 
-	// 🔥 Combinar y centrar las celdas de las nuevas filas
-	$startRow = 13 + 12;          // fila donde se corta la tabla original
+	//Combinar y centrar las celdas de las nuevas filas
+	$startRow = 13 + 12;  
 	$endRow = $startRow + $extra - 1;
 
 	for ($row = $startRow; $row <= $endRow; $row++) {
@@ -241,7 +250,7 @@ if ($extra > 0) {
 }
 
 // Llenar datos
-llenarEncabezado($sheet, $pedido);
+llenarEncabezado($sheet, $pedido, $extra);
 llenarItems($sheet, $items);
 insertarFirmas($sheet, $pedido, $extra);
 responsableProceso($sheet, $pedido, $extra);
