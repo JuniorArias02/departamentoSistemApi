@@ -7,7 +7,8 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 // --- Configuración base ---
 define("BASE_PATH", __DIR__ . "/../");
 
@@ -78,34 +79,49 @@ function getItems($pdo, $idPedido)
 // 2. --- Excel helpers ---
 function llenarEncabezado($sheet, $pedido, $extra)
 {
-    $date = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($pedido['fecha']));
+    // Fecha
+    $date = ExcelDate::PHPToExcel(new DateTime($pedido['fecha']));
     $sheet->setCellValue("E6", $date);
-    $sheet->getStyle("E6")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+    $sheet->getStyle("E6")
+        ->getNumberFormat()
+        ->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
 
+    // Otros datos
     $sheet->setCellValue("E7", $pedido['proceso_solicitante']);
-
     $sheet->setCellValue("I6", $pedido['consecutivo']);
     $sheet->setCellValue("I7", $pedido['sede']);
 
+    // Marcar tipo de solicitud
     if ($pedido['tipo_solicitud'] === "Prioritaria") {
         $sheet->setCellValue("J9", "X");
     } elseif ($pedido['tipo_solicitud'] === "Recurrente") {
         $sheet->setCellValue("G9", "X");
     }
 
+    // === Observaciones ===
     $obsRow  = 26 + $extra;
     $obsCell = "B{$obsRow}";
 
-    $currentObs = $sheet->getCell($obsCell)->getValue();
-    if (!empty($currentObs)) {
-        $sheet->setCellValue($obsCell, $currentObs . " " . $pedido['observaciones']);
-    } else {
-        $sheet->setCellValue($obsCell, $pedido['observaciones']);
-    }
+    $sheet->getStyle($obsCell)
+        ->getAlignment()
+        ->setWrapText(true)
+        ->setVertical(Alignment::VERTICAL_TOP);
 
-    
-    $sheet->getStyle($obsCell)->getAlignment()->setWrapText(true);
-    $sheet->getRowDimension($obsRow)->setRowHeight(-1);
+    $textoObs = !empty($sheet->getCell($obsCell)->getValue())
+        ? $sheet->getCell($obsCell)->getValue() . ' ' . $pedido['observaciones']
+        : $pedido['observaciones'];
+
+    $sheet->setCellValue($obsCell, $textoObs);
+
+    $anchoAprox = 50;
+    $alturaLinea = 15;
+    $lineas = ceil(strlen($textoObs) / $anchoAprox);
+    if ($lineas < 1) $lineas = 1;
+
+    $altura = $lineas * $alturaLinea;
+
+    // Establecer altura calculada
+    $sheet->getRowDimension($obsRow)->setRowHeight($altura);
 }
 
 
@@ -233,7 +249,7 @@ if ($extra > 0) {
 	$sheet->insertNewRowBefore($insertStart, $extra);
 
 	//Combinar y centrar las celdas de las nuevas filas
-	$startRow = 13 + 12;  
+	$startRow = 13 + 12;
 	$endRow = $startRow + $extra - 1;
 
 	for ($row = $startRow; $row <= $endRow; $row++) {
