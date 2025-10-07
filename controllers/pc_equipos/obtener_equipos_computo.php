@@ -68,7 +68,7 @@ $stmt = $pdo->prepare("
         p.cedula AS responsable_cedula,
         p.telefono AS responsable_telefono,
         ps.nombre AS responsable_cargo,
-        p.proceso AS responsable_proceso,
+        
 
         -- Área
         a.nombre AS area_nombre,
