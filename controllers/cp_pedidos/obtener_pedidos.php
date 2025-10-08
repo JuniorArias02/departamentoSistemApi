@@ -35,6 +35,7 @@ try {
             p.fecha_solicitud,
             dp.nombre AS proceso_solicitante,
             p.tipo_solicitud,
+            p.motivo_aprobacion,
             s.nombre AS sede_nombre,
             ts.nombre AS tipo_solicitud_nombre,
             p.consecutivo,
@@ -93,7 +94,7 @@ try {
     // Obtener items por pedido
     foreach ($pedidos as &$pedido) {
         $stmtItems = $pdo->prepare("
-            SELECT id, nombre, cantidad,unidad_medida, referencia_items 
+            SELECT id, nombre, cantidad,unidad_medida, referencia_items, comprado
             FROM cp_items_pedidos 
             WHERE cp_pedido = :id
         ");

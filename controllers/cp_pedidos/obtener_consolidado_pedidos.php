@@ -5,7 +5,6 @@ require_once __DIR__ . '/../../middlewares/cors.php';
 header('Content-Type: application/json');
 
 try {
-    // Usa el $pdo de conexion.php
     $sql = "
         SELECT 
             u.sede_id AS SEDE,

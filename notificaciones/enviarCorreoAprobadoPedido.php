@@ -16,7 +16,8 @@ function enviarCorreoAprobacionPedido(
     $procesoSolicitante,
     $tipoSolicitud,
     $observacion,
-    $consecutivo = null
+    $consecutivo = null,
+    $motivoAprobacion,
 ) {
     $mail = new PHPMailer(true);
 
@@ -117,6 +118,10 @@ function enviarCorreoAprobacionPedido(
             <div class="detail-grid">
                 <div class="detail-label">Solicitante:</div>
                 <div class="detail-value">{$procesoSolicitante}</div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-label">Motivo Aprobacion:</div>
+                <div class="detail-value">{$motivoAprobacion}</div>
             </div>
             <div class="detail-grid">
                 <div class="detail-label">Tipo:</div>

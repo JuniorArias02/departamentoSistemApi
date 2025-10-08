@@ -15,10 +15,12 @@ if (!$data) {
     echo json_encode(["error" => "Datos inválidos"]);
     exit;
 }
+
 $usuarioId = $data['id_usuario'] ?? null;
 $tipoAprobacion = $data['tipo'] ?? 'compra';
+$motivo = $data['motivo_aprobacion'] ?? null; // <-- Nuevo campo opcional
 
-// Permiso para rechazar
+// Permiso para aprobar
 if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['APROBAR_PEDIDO'])) {
     http_response_code(403);
     echo json_encode(["error" => "No tienes permisos para aprobar pedidos"]);
@@ -36,7 +38,6 @@ $sqlCreador = "
 $stmtCreador = $pdo->prepare($sqlCreador);
 $stmtCreador->execute([':id_pedido' => $data['id_pedido']]);
 $usuarioCreador = $stmtCreador->fetch(PDO::FETCH_ASSOC);
-
 
 // Validar campos obligatorios
 $campos_obligatorios = ['id_usuario', 'id_pedido', 'tipo'];
@@ -61,37 +62,41 @@ if ($tipoAprobacion === 'compra') {
     $data['responsable_aprobacion'] = $usuarioId;
 }
 
-
 try {
-    // Actualizar pedido
+    // Actualizar pedido con motivo
     $sqlUpdate = "
-    UPDATE cp_pedidos
-    SET $campoEstado = :estado,
-        " . ($tipoAprobacion === 'compra' ? 'proceso_compra' : 'responsable_aprobacion') . " = :usuario
-    WHERE id = :id_pedido
-";
+        UPDATE cp_pedidos
+        SET $campoEstado = :estado,
+            " . ($tipoAprobacion === 'compra' ? 'proceso_compra' : 'responsable_aprobacion') . " = :usuario,
+            motivo_aprobacion = :motivo
+        WHERE id = :id_pedido
+    ";
+
     $stmtUpdate = $pdo->prepare($sqlUpdate);
     $stmtUpdate->execute([
         ':estado' => $data[$campoEstado],
         ':usuario' => $usuarioId,
+        ':motivo' => $motivo,
         ':id_pedido' => $data['id_pedido']
     ]);
+
     // Obtener datos del pedido para el correo
     $sqlPedido = "
-    SELECT p.fecha_solicitud, 
-           p.proceso_solicitante, 
-           p.tipo_solicitud, 
-           ts.nombre AS nombre_tipo, 
-           p.consecutivo, 
-           p.observacion
-    FROM cp_pedidos p
-    LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
-    WHERE p.id = :id_pedido
-";
+        SELECT p.fecha_solicitud, 
+               ds.nombre AS proceso_solicitante, 
+               p.tipo_solicitud, 
+               ts.nombre AS nombre_tipo, 
+               p.consecutivo, 
+               p.observacion,
+               p.motivo_aprobacion
+        FROM cp_pedidos p
+        LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
+        LEFT JOIN dependencias_sedes ds ON ds.id = p.proceso_solicitante
+        WHERE p.id = :id_pedido
+    ";
     $stmtPedido = $pdo->prepare($sqlPedido);
     $stmtPedido->execute([':id_pedido' => $data['id_pedido']]);
     $pedido = $stmtPedido->fetch(PDO::FETCH_ASSOC);
-
 
     if (!$pedido) {
         http_response_code(404);
@@ -99,7 +104,6 @@ try {
         exit;
     }
 
-    // Registrar actividad
     registrarActividad(
         $pdo,
         $data['id_usuario'],
@@ -108,6 +112,7 @@ try {
         $data['id_pedido']
     );
 
+    // Enviar correo al creador
     if ($usuarioCreador) {
         enviarCorreoAprobacionPedido(
             $usuarioCreador['correo'],
@@ -116,11 +121,12 @@ try {
             $pedido['proceso_solicitante'],
             $pedido['nombre_tipo'],
             $pedido['observacion'] ?? '',
-            $pedido['consecutivo']
+            $pedido['consecutivo'],
+            $pedido['motivo_aprobacion'] ?? ''
         );
     }
 
-    // Enviar correo a todos los usuarios con el permiso VER_PEDIDOS_ENCARGADO
+    // Notificar a gerente comercial si aplica
     if ($tipoAprobacion === 'compra') {
         notificarNuevoPedidoGerenteComercial(
             $pdo,
@@ -131,7 +137,6 @@ try {
             $pedido['consecutivo']
         );
     }
-
 
     echo json_encode([
         "success" => true,

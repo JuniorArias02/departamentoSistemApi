@@ -7,7 +7,7 @@ require_once __DIR__ . '/../utils/registrar_actividad.php';
 require_once __DIR__ . '/../../notificaciones/enviarCorreoNuevoPedido.php';
 require_once __DIR__ . '/../notif_notificaciones/notificarNuevoPedidoCompras.php';
 
-// Leer el JSON
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!$data) {
@@ -67,7 +67,7 @@ try {
 
     $sqlPedido = "
     SELECT p.fecha_solicitud, 
-           p.proceso_solicitante, 
+           ds.nombre AS proceso_solicitante,
            ts.nombre AS nombre_tipo,
            p.consecutivo,
            p.observacion,
@@ -76,9 +76,11 @@ try {
     FROM cp_pedidos p
     JOIN usuarios u ON u.id = p.creador_por
     LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
+    LEFT JOIN dependencias_sedes ds ON ds.id = p.proceso_solicitante
     WHERE p.id = :id
     LIMIT 1
 ";
+
     $stmtPedido = $pdo->prepare($sqlPedido);
     $stmtPedido->execute([':id' => $pedido_id]);
     $pedido = $stmtPedido->fetch(PDO::FETCH_ASSOC);
