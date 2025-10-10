@@ -17,7 +17,7 @@ $usuarioId = intval($data['id_usuario']);
 $itemId = intval($data['item_id']);
 $comprado = intval($data['comprado']);
 
-if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['APROBAR_PEDIDO'])) {
+if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['MARCAR_ENTREGA'])) {
 	http_response_code(403);
 	echo json_encode(["error" => "No tienes permisos para esta opcion"]);
 	exit;

@@ -97,7 +97,8 @@ const PERMISOS = [
         'APROBAR_PEDIDO' => 'aprobar_pedido',
         'CREAR_PEDIDO' => 'crear_pedido',
         'CREAR_ENTREGA_SOLICITUD' => 'crear_entrega_solicitud',
-        'CREAR_DESCUENTO_FIJOS' => 'crear_descuento_fijos'
+        'CREAR_DESCUENTO_FIJOS' => 'crear_descuento_fijos',
+        'MARCAR_ENTREGA' => 'marcar_entrega_item_pedido',
     ],
 
     'REPORTES' => [
