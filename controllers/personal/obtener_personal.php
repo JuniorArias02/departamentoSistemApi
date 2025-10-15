@@ -8,7 +8,6 @@ try {
     p.id,
     p.nombre,
     p.cedula,
-    p.proceso,
     c.nombre as cargo
     FROM personal as p
     LEFT JOIN p_cargo as c ON p.cargo_id = c.id

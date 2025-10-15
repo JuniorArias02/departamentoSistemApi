@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Recibir filtros
 $data = json_decode(file_get_contents("php://input"), true);
-$fechaInicio = $data['fecha_inicio'] ?? '2025-01-01';
+$fechaInicio = $data['fecha_inicio'] ?? '2025-10-01';
 $fechaFin = $data['fecha_fin'] ?? '2025-12-31';
 
 // Consulta 
@@ -21,7 +21,7 @@ $sqlPedidos = "
 SELECT 
     u.sede_id AS SEDE,
     p.consecutivo AS CONSECUTIVO,
-	p.proceso_solicitante AS PROCESO,
+	ds.nombre AS PROCESO,
 	s.nombre AS SEDE,
     p.observacion AS DESCRIPCION,
     p.observacion_diligenciado AS OBSERVACION,
@@ -39,6 +39,7 @@ LEFT JOIN
     cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
 LEFT JOIN
     sedes s ON s.id = p.sede_id
+LEFT JOIN  dependencias_sedes ds ON ds.id = p.proceso_solicitante
 WHERE 
     p.fecha_solicitud BETWEEN :fecha_inicio AND :fecha_fin
 ORDER BY p.fecha_solicitud ASC

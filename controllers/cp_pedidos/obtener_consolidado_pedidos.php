@@ -7,6 +7,7 @@ header('Content-Type: application/json');
 try {
     $sql = "
         SELECT 
+            p.id AS ID,
             u.sede_id AS SEDE,
             p.consecutivo AS CONSECUTIVO,
             ds.nombre AS PROCESO,
@@ -18,7 +19,8 @@ try {
             p.fecha_solicitud AS FECHA_SOLICITUD,
             p.fecha_compra AS FECHA_RESPUESTA,
             p.responsable_aprobacion_firma AS FIRMA_RESPONSABLE,
-            p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE
+            p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE,
+            p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS
         FROM cp_pedidos p
         LEFT JOIN usuarios u ON u.id = p.elaborado_por
         LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud

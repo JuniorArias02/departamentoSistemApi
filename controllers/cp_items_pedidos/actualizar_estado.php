@@ -7,7 +7,7 @@ require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (!isset($data['item_id']) || !isset($data['comprado'] ) || !isset($data['id_usuario'])) {
+if (!isset($data['item_id']) || !isset($data['comprado']) || !isset($data['id_usuario'])) {
 	http_response_code(400);
 	echo json_encode(["error" => "Faltan campos requeridos"]);
 	exit;
