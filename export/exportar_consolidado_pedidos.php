@@ -23,14 +23,20 @@ SELECT
     p.consecutivo AS CONSECUTIVO,
 	ds.nombre AS PROCESO,
 	s.nombre AS SEDE,
-    p.observacion AS DESCRIPCION,
-    p.observacion_diligenciado AS OBSERVACION,
+    p.observacion AS OBSERVACION,
+    p.observacion_diligenciado AS OBSERVACION_DILIGENCIADO,
     ts.nombre AS TIPO_COMPRA,
     p.estado_compras AS APROBACION,
     p.fecha_solicitud AS FECHA_SOLICITUD,
     p.fecha_compra AS FECHA_RESPUESTA,
     p.responsable_aprobacion_firma AS FIRMA_RESPONSABLE,
-    p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE
+    p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS,
+    p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE,
+    (
+        SELECT GROUP_CONCAT(i.nombre SEPARATOR ', ')
+        FROM cp_items_pedidos i
+        WHERE i.cp_pedido = p.id
+    ) AS DESCRIPCION
 FROM 
     cp_pedidos p
 LEFT JOIN 
@@ -39,11 +45,13 @@ LEFT JOIN
     cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
 LEFT JOIN
     sedes s ON s.id = p.sede_id
-LEFT JOIN  dependencias_sedes ds ON ds.id = p.proceso_solicitante
+LEFT JOIN  
+    dependencias_sedes ds ON ds.id = p.proceso_solicitante
 WHERE 
     p.fecha_solicitud BETWEEN :fecha_inicio AND :fecha_fin
 ORDER BY p.fecha_solicitud ASC
 ";
+
 
 $stmt = $pdo->prepare($sqlPedidos);
 $stmt->execute([
@@ -64,16 +72,16 @@ $startRow = 3;
 foreach ($pedidos as $i => $pedido) {
     $row = $startRow + $i;
     $sheet->setCellValue("A{$row}", $pedido['FECHA_SOLICITUD']);
-	$sheet->setCellValue("B{$row}", $pedido['PROCESO']);
-	$sheet->setCellValue("C{$row}", $pedido['SEDE']);
+    $sheet->setCellValue("B{$row}", $pedido['PROCESO']);
+    $sheet->setCellValue("C{$row}", $pedido['SEDE']);
     $sheet->setCellValue("D{$row}", $pedido['CONSECUTIVO']);
     $sheet->setCellValue("E{$row}", $pedido['DESCRIPCION']);
     $sheet->setCellValue("F{$row}", $pedido['OBSERVACION']);
     $sheet->setCellValue("G{$row}", $pedido['TIPO_COMPRA']);
     $sheet->setCellValue("H{$row}", $pedido['APROBACION']);
     $sheet->setCellValue("M{$row}", $pedido['FECHA_RESPUESTA']);
-    $sheet->setCellValue("N{$row}", $pedido['FECHA_RESPUESTA_SOLICITANTE']);
-    insertarFirma($sheet, $pedido['FIRMA_RESPONSABLE'], "K{$row}");
+    $sheet->setCellValue("N{$row}", $pedido['OBSERVACIONES_PEDIDOS']);
+    // insertarFirma($sheet, $pedido['FIRMA_RESPONSABLE'], "K{$row}");
 }
 
 // --- Descargar Excel ---
@@ -105,4 +113,3 @@ function insertarFirma($sheet, $rutaFirma, $celda)
     $drawing->setHeight($filaHeight);
     $drawing->setWorksheet($sheet);
 }
-
