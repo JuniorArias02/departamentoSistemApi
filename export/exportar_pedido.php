@@ -63,6 +63,7 @@ function getItems($pdo, $idPedido)
         SELECT 
             i.nombre,
             i.cantidad,
+			i.unidad_medida,
             i.referencia_items AS referencia,
             i.productos_id,
             p.codigo AS codigo_producto
@@ -128,7 +129,6 @@ function llenarEncabezado($sheet, $pedido, $extra)
 
 function llenarItems($sheet, $items, $startRow = 13)
 {
-	// 🔥 Auto-ajustar columnas una sola vez
 	foreach (['B', 'C', 'I', 'J'] as $col) {
 		$sheet->getColumnDimension($col)->setAutoSize(true);
 	}
@@ -142,12 +142,12 @@ function llenarItems($sheet, $items, $startRow = 13)
 
 		$sheet->setCellValue("B{$row}", $cellValue);
 		$sheet->setCellValue("C{$row}", $item['nombre']);
-		$sheet->setCellValue("I{$row}", "unidades");
+		$sheet->setCellValue("I{$row}", $item['unidad_medida']);
 		$sheet->setCellValue("J{$row}", $item['cantidad']);
 
 		// 🪄 Ajustes visuales
-		$sheet->getRowDimension($row)->setRowHeight(-1);               // altura automática
-		$sheet->getStyle("C{$row}")->getAlignment()->setWrapText(true); // salto de línea
+		$sheet->getRowDimension($row)->setRowHeight(-1);
+		$sheet->getStyle("C{$row}")->getAlignment()->setWrapText(true);
 	}
 }
 

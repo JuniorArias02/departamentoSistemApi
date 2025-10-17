@@ -29,42 +29,49 @@ try {
 
     // Base de la consulta
     $sql = "
-        SELECT 
-            p.id,
-            p.estado_compras,
-            p.fecha_solicitud,
-            dp.nombre AS proceso_solicitante,
-            p.tipo_solicitud,
-            p.motivo_aprobacion,
-            s.nombre AS sede_nombre,
-            ts.nombre AS tipo_solicitud_nombre,
-            p.consecutivo,
-            p.observacion,
-            p.elaborado_por,
-            u1.nombre_completo AS elaborado_por_nombre,
-            p.elaborado_por_firma,
-            p.proceso_compra,
-            u2.nombre_completo AS proceso_compra_nombre,
-            p.proceso_compra_firma,
-            p.responsable_aprobacion,
-            u3.nombre_completo AS responsable_aprobacion_nombre,
-            p.responsable_aprobacion_firma,
-            p.creador_por,
-            u4.nombre_completo AS creador_nombre,
-            p.pedido_visto,
-            p.observacion_diligenciado,
-            p.estado_gerencia,
-            es.estado AS estado_entrega
-        FROM cp_pedidos p
-        LEFT JOIN usuarios u1 ON p.elaborado_por = u1.id
-        LEFT JOIN usuarios u2 ON p.proceso_compra = u2.id
-        LEFT JOIN usuarios u3 ON p.responsable_aprobacion = u3.id
-        LEFT JOIN usuarios u4 ON p.creador_por = u4.id
-        LEFT JOIN cp_tipo_solicitud ts ON p.tipo_solicitud = ts.id
-        LEFT JOIN sedes s ON p.sede_id = s.id
-        LEFT JOIN cp_entrega_solicitud es ON es.consecutivo_id = p.consecutivo
-        LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
-    ";
+    SELECT 
+        p.id,
+        p.estado_compras,
+        p.fecha_solicitud,
+        dp.nombre AS proceso_solicitante,
+        p.tipo_solicitud,
+        p.motivo_aprobacion,
+        s.nombre AS sede_nombre,
+        ts.nombre AS tipo_solicitud_nombre,
+        p.consecutivo,
+        p.observacion,
+        p.elaborado_por,
+        u1.nombre_completo AS elaborado_por_nombre,
+        p.elaborado_por_firma,
+        p.proceso_compra,
+        u2.nombre_completo AS proceso_compra_nombre,
+        p.proceso_compra_firma,
+        p.responsable_aprobacion,
+        u3.nombre_completo AS responsable_aprobacion_nombre,
+        p.responsable_aprobacion_firma,
+        p.creador_por,
+        u4.nombre_completo AS creador_nombre,
+        p.pedido_visto,
+        p.observacion_diligenciado,
+        p.estado_gerencia,
+        es.estado AS estado_entrega,
+        -- 👇 campo para el front
+        CASE 
+            WHEN p.adjunto_pdf IS NOT NULL AND p.adjunto_pdf <> '' THEN 'Sí'
+            ELSE 'No'
+        END AS tiene_adjunto
+
+    FROM cp_pedidos p
+    LEFT JOIN usuarios u1 ON p.elaborado_por = u1.id
+    LEFT JOIN usuarios u2 ON p.proceso_compra = u2.id
+    LEFT JOIN usuarios u3 ON p.responsable_aprobacion = u3.id
+    LEFT JOIN usuarios u4 ON p.creador_por = u4.id
+    LEFT JOIN cp_tipo_solicitud ts ON p.tipo_solicitud = ts.id
+    LEFT JOIN sedes s ON p.sede_id = s.id
+    LEFT JOIN cp_entrega_solicitud es ON es.consecutivo_id = p.consecutivo
+    LEFT JOIN dependencias_sedes dp ON dp.id = p.proceso_solicitante
+";
+
 
     // Construir filtros según permisos
     $conditions = [];
