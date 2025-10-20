@@ -55,6 +55,7 @@ try {
         p.observacion_diligenciado,
         p.estado_gerencia,
         es.estado AS estado_entrega,
+        p.adjunto_pdf AS adjunto_url,
         -- 👇 campo para el front
         CASE 
             WHEN p.adjunto_pdf IS NOT NULL AND p.adjunto_pdf <> '' THEN 'Sí'
