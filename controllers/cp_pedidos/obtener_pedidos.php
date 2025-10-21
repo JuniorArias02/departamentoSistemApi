@@ -102,8 +102,9 @@ try {
     // Obtener items por pedido
     foreach ($pedidos as &$pedido) {
         $stmtItems = $pdo->prepare("
-            SELECT id, nombre, cantidad,unidad_medida, referencia_items, comprado
-            FROM cp_items_pedidos 
+            SELECT cp.id, cp.nombre, cp.cantidad,cp.unidad_medida, cp.referencia_items, cp.comprado , cpro.codigo AS codigo_producto
+            FROM cp_items_pedidos AS cp
+            INNER JOIN cp_productos AS cpro ON cp.productos_id = cpro.id
             WHERE cp_pedido = :id
         ");
         $stmtItems->execute([':id' => $pedido['id']]);
