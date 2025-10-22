@@ -194,8 +194,8 @@ try {
             "creado_por" => $data["creado_por"],
             "codigo_barras" => $data["codigo_barras"] ?? null,
             "grupo" => $data["grupo"] ?? null,
-            "vida_util" => (!empty($data["vida_util"]) ? $data["vida_util"] : null),
-            "vida_util_niff" => (!empty($data["vida_util_niff"]) ? $data["vida_util_niff"] : null),
+            "vida_util" => $data["vida_util"] ? $data["vida_util"] : null,
+            "vida_util_niff" => $data["vida_util_niff"] ? $data["vida_util_niff"] : null,
             "centro_costo" => $data["centro_costo"] ?? null,
             "ubicacion" => $data["ubicacion"] ?? null,
             "proveedor" => $data["proveedor"] ?? null,
@@ -242,7 +242,8 @@ try {
 
     echo json_encode([
         "msg" => !empty($data['id']) ? "Inventario actualizado con éxito" : "Inventario registrado con éxito",
-        "data" => $registro
+        "data" => $registro,
+        "id" => $id,
     ]);
 } catch (PDOException $e) {
     http_response_code(500);

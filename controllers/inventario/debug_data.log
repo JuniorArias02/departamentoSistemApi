@@ -1,37 +1,24 @@
 Array
 (
-<<<<<<< HEAD
-    [codigo] => PRUEBAS
-    [nombre] => PRUEBAS
-    [dependencia] => PRUEBAS
-    [responsable] => PRUEBAS
-    [marca] => PRUEBAS
-    [modelo] => PRUEBAS
-    [serial] => PRUEBAS
-    [sede_id] => 3
-    [codigo_barras] => PRUEBAS
-    [grupo] => PRUEBAS
-=======
-    [codigo] => ME0100
-    [nombre] => SILLA CON RODACHINES NEGRA
-    [dependencia] => SALA DE ADMINISTRACIÓN DE MEDICAMENTOS 
+    [codigo] => PREUBAS22
+    [nombre] => PREUBAS22
+    [dependencia] => PREUBAS22
     [responsable] => 
     [marca] => 
     [modelo] => 
     [serial] => 
-    [sede_id] => 1
+    [sede_id] => 3
     [codigo_barras] => 
     [grupo] => 
->>>>>>> compras
-    [vida_util] => 
-    [vida_util_niff] => 
+    [vida_util] => 12
+    [vida_util_niff] => 36
     [centro_costo] => 
     [ubicacion] => 
     [proveedor] => 
     [fecha_compra] => 
     [soporte] => 
     [descripcion] => 
-    [estado] => PRUEBAS
+    [estado] => 
     [escritura] => 
     [matricula] => 
     [valor_compra] => 
@@ -43,5 +30,9 @@ Array
     [tipo_adquisicion] => 
     [calibrado] => 
     [observaciones] => 
+    [soporte_adjunto] => Array
+        (
+        )
+
     [creado_por] => 8
 )
