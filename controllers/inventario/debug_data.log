@@ -1,18 +1,18 @@
 Array
 (
-    [codigo] => PREUBAS22
-    [nombre] => PREUBAS22
-    [dependencia] => PREUBAS22
-    [responsable] => 
+    [codigo] => 145236789
+    [nombre] => 145236789
+    [dependencia] => CONSULTORIOS MEDICOS
+    [responsable] => 145236789
     [marca] => 
     [modelo] => 
     [serial] => 
     [sede_id] => 3
     [codigo_barras] => 
     [grupo] => 
-    [vida_util] => 12
-    [vida_util_niff] => 36
-    [centro_costo] => 
+    [vida_util] => 
+    [vida_util_niff] => 
+    [centro_costo] => 110006
     [ubicacion] => 
     [proveedor] => 
     [fecha_compra] => 
@@ -30,9 +30,6 @@ Array
     [tipo_adquisicion] => 
     [calibrado] => 
     [observaciones] => 
-    [soporte_adjunto] => Array
-        (
-        )
-
+    [soporte_adjunto] => 
     [creado_por] => 8
 )
