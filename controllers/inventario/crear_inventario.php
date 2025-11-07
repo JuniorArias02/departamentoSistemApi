@@ -51,6 +51,7 @@ try {
             serial = :serial,
             sede_id = :sede_id,
             codigo_barras = :codigo_barras,
+            num_factu = :num_factu,
             grupo = :grupo,
             vida_util = :vida_util,
             vida_util_niff = :vida_util_niff,
@@ -72,7 +73,8 @@ try {
             tipo_adquisicion = :tipo_adquisicion,
             calibrado = :calibrado,
             observaciones = :observaciones,
-            fecha_actualizacion = NOW()
+            fecha_actualizacion = NOW(),
+            tipo_bien = :tipo_bien
             WHERE id = :id");
 
         if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['EDITAR'])) {
@@ -94,6 +96,7 @@ try {
             "serial" => $data["serial"] ?? null,
             "sede_id" => $data["sede_id"] ?? null,
             "codigo_barras" => $data["codigo_barras"] ?? null,
+            "num_factu" => $data["num_factu"] ?? null,
             "grupo" => $data["grupo"] ?? null,
             "vida_util" => !empty($data["vida_util"]) ? $data["vida_util"] : null,
             "vida_util_niff" => !empty($data["vida_util_niff"]) ? $data["vida_util_niff"] : null,
@@ -115,6 +118,7 @@ try {
             "tipo_adquisicion" => $data["tipo_adquisicion"] ?? null,
             "calibrado" => !empty($data["calibrado"]) ? $data["calibrado"] : null,
             "observaciones" => $data["observaciones"] ?? null,
+            "tipo_bien" => $data["tipo_bien"] ?? null,
             "id" => $data["id"]
         ]);
 
@@ -158,16 +162,16 @@ try {
         // CREAR NUEVO INVENTARIO
         $stmt = $pdo->prepare("INSERT INTO inventario 
             (codigo, nombre, dependencia, responsable, marca, modelo, serial, sede_id, creado_por,
-             codigo_barras, grupo, vida_util, vida_util_niff, centro_costo, ubicacion, proveedor,
+             codigo_barras, num_factu, grupo, vida_util, vida_util_niff, centro_costo, ubicacion, proveedor,
              fecha_compra, soporte, descripcion, estado, escritura, matricula, valor_compra,
              salvamenta, depreciacion, depreciacion_niif, meses, meses_niif, tipo_adquisicion,
-             calibrado, observaciones)
+             calibrado, observaciones, tipo_bien)
             VALUES 
             (:codigo, :nombre, :dependencia, :responsable, :marca, :modelo, :serial, :sede_id, :creado_por,
-             :codigo_barras, :grupo, :vida_util, :vida_util_niff, :centro_costo, :ubicacion, :proveedor,
+             :codigo_barras, :num_factu, :grupo, :vida_util, :vida_util_niff, :centro_costo, :ubicacion, :proveedor,
              :fecha_compra, :soporte, :descripcion, :estado, :escritura, :matricula, :valor_compra,
              :salvamenta, :depreciacion, :depreciacion_niif, :meses, :meses_niif, :tipo_adquisicion,
-             :calibrado, :observaciones)");
+             :calibrado, :observaciones , :tipo_bien)");
 
 
         $valorCompra = str_replace(',', '.', $data["valor_compra"]);
@@ -193,6 +197,7 @@ try {
             "sede_id" => $data["sede_id"] ?? null,
             "creado_por" => $data["creado_por"],
             "codigo_barras" => $data["codigo_barras"] ?? null,
+            "num_factu" => $data["num_factu"] ?? null,
             "grupo" => $data["grupo"] ?? null,
             "vida_util" => $data["vida_util"] ? $data["vida_util"] : null,
             "vida_util_niff" => $data["vida_util_niff"] ? $data["vida_util_niff"] : null,
@@ -213,7 +218,8 @@ try {
             "meses_niif" => $data["meses_niif"] ?? null,
             "tipo_adquisicion" => $data["tipo_adquisicion"] ?? null,
             "calibrado" => (!empty($data["calibrado"]) ? $data["calibrado"] : null),
-            "observaciones" => $data["observaciones"] ?? null
+            "observaciones" => $data["observaciones"] ?? null,
+            "tipo_bien" => $data["tipo_bien"] ?? null
         ]);
 
         if ($stmt->rowCount() === 0) {

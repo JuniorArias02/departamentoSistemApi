@@ -1,35 +1,41 @@
 Array
 (
-    [codigo] => 145236789
-    [nombre] => 145236789
-    [dependencia] => CONSULTORIOS MEDICOS
-    [responsable] => 145236789
-    [marca] => 
-    [modelo] => 
-    [serial] => 
+    [codigo] => Serial de Inventario*
+    [nombre] => Nombre del Activo
+    [dependencia] => RECEPCION 1 - PGP CAPITA
+    [responsable] => junior eidme rasitas
+    [marca] => Marca
+    [modelo] => Modelo
+    [serial] => Serial
     [sede_id] => 3
-    [codigo_barras] => 
-    [grupo] => 
-    [vida_util] => 
-    [vida_util_niff] => 
-    [centro_costo] => 110006
-    [ubicacion] => 
-    [proveedor] => 
-    [fecha_compra] => 
-    [soporte] => 
+    [codigo_barras] => Código de Barras
+    [grupo] => EC
+    [vida_util] => 1234
+    [vida_util_niff] => 1234
+    [centro_costo] => 110008
+    [ubicacion] => Ubicación específica
+    [proveedor] => Proveedor
+    [fecha_compra] => 2025-11-07
+    [soporte] => 121212
     [descripcion] => 
-    [estado] => 
-    [escritura] => 
-    [matricula] => 
-    [valor_compra] => 
-    [salvamenta] => 
-    [depreciacion] => 
-    [depreciacion_niif] => 
-    [meses] => 
-    [meses_niif] => 
-    [tipo_adquisicion] => 
-    [calibrado] => 
-    [observaciones] => 
-    [soporte_adjunto] => 
+    [estado] => NUEVO
+    [escritura] => Escritura
+    [matricula] => Matrícula
+    [valor_compra] => 123
+    [salvamenta] => 2
+    [depreciacion] => 12
+    [depreciacion_niif] => 13
+    [meses] => 13
+    [meses_niif] => 12
+    [tipo_adquisicion] => INVENTARIO_INICIAL
+    [calibrado] => 2025-11-07
+    [observaciones] => Observaciones
+    [tipo_bien] => mueble
+    [soporte_adjunto] => Array
+        (
+        )
+
+    [num_factu] => N facturas
+    [accesorios] => Accesorios
     [creado_por] => 8
 )
