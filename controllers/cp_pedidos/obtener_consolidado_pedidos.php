@@ -20,7 +20,7 @@ try {
             p.fecha_compra AS FECHA_RESPUESTA,
             p.responsable_aprobacion_firma AS FIRMA_RESPONSABLE,
             p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE,
-            p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS
+            p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS,
             p.fecha_solicitud_cotizacion AS FECHA_SOLICITUD_COTIZACION,
             p.fecha_respuesta_cotizacion AS FECHA_RESPUESTA_COTIZACION,
             p.firma_aprobacion_orden AS FIRMA_APROBACION_ORDEN,
