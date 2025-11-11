@@ -25,11 +25,13 @@ $sqlEntrega = "SELECT
     s.nombre as sede,
     p.nombre as personal,
     p.cedula,
-    c.nombre as cargo
+    c.nombre as cargo,
+	dep.nombre as dependencia
 FROM cp_entrega_activos_fijos ef
 LEFT JOIN personal p ON p.id = ef.personal_id
 LEFT JOIN sedes s ON s.id = ef.sede_id
 LEFT JOIN p_cargo c ON c.id = p.cargo_id
+LEFT JOIN dependencias_sedes dep ON dep.id = ef.proceso_solicitante
 WHERE ef.id = :id";
 
 $stmt = $pdo->prepare($sqlEntrega);
@@ -65,15 +67,16 @@ if ($entrega) {
 	$sheet->setCellValue("C8", $fecha->format("m"));
 	$sheet->setCellValue("D8", $fecha->format("Y"));
 
-	$sheet->setCellValue("O6", $entrega['sede']);
-	$sheet->setCellValue("H7", $entrega['personal']);
-	$sheet->setCellValue("O7", $entrega['cedula']);
+	$sheet->setCellValue("O8", $entrega['sede']);
+	$sheet->setCellValue("H6", $entrega['personal']);
+	$sheet->setCellValue("H7", $entrega['cedula']);
 	$sheet->setCellValue("H8", $entrega['cargo']);
+
+	$sheet->setCellValue("O7", $entrega['dependencia']);
 
 	// firmas
 	insertarFirma($sheet, $entrega['firma_quien_entrega'], "H20", 5, 10);
-insertarFirma($sheet, $entrega['firma_quien_recibe'], "S20", -10, 10);
-
+	insertarFirma($sheet, $entrega['firma_quien_recibe'], "S20", -10, 10);
 }
 
 // 👉 Items (detalle, como tabla)

@@ -1,41 +1,40 @@
 Array
 (
-    [codigo] => Serial de Inventario*
-    [nombre] => Nombre del Activo
-    [dependencia] => RECEPCION 1 - PGP CAPITA
-    [responsable] => junior eidme rasitas
-    [marca] => Marca
-    [modelo] => Modelo
-    [serial] => Serial
+    [id] => 3
+    [codigo] => ME10057
+    [nombre] => ESCRITORIO DE MADERA 3 GABETAS
+    [dependencia] => FISIOTERAPIA
+    [responsable] => MAITY ROJAS
+    [marca] => N/A
+    [modelo] => N/A
+    [serial] => N/A
     [sede_id] => 3
-    [codigo_barras] => Código de Barras
-    [grupo] => EC
-    [vida_util] => 1234
-    [vida_util_niff] => 1234
-    [centro_costo] => 110008
-    [ubicacion] => Ubicación específica
-    [proveedor] => Proveedor
-    [fecha_compra] => 2025-11-07
-    [soporte] => 121212
+    [codigo_barras] => 
+    [grupo] => 
+    [vida_util] => 
+    [vida_util_niff] => 
+    [centro_costo] => 
+    [ubicacion] => 
+    [proveedor] => 
+    [fecha_compra] => 
+    [soporte] => 
     [descripcion] => 
-    [estado] => NUEVO
-    [escritura] => Escritura
-    [matricula] => Matrícula
-    [valor_compra] => 123
-    [salvamenta] => 2
-    [depreciacion] => 12
-    [depreciacion_niif] => 13
-    [meses] => 13
-    [meses_niif] => 12
-    [tipo_adquisicion] => INVENTARIO_INICIAL
-    [calibrado] => 2025-11-07
-    [observaciones] => Observaciones
-    [tipo_bien] => mueble
+    [estado] => 
+    [escritura] => 
+    [matricula] => 
+    [valor_compra] => 
+    [salvamenta] => 
+    [depreciacion] => 
+    [depreciacion_niif] => 
+    [meses] => 
+    [meses_niif] => 
+    [tipo_adquisicion] => 
+    [calibrado] => 
+    [observaciones] => 
+    [tipo_bien] => 
     [soporte_adjunto] => Array
         (
         )
 
-    [num_factu] => N facturas
-    [accesorios] => Accesorios
     [creado_por] => 8
 )

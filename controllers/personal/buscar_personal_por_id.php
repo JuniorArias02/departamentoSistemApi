@@ -15,8 +15,7 @@ try {
                 p.nombre, 
                 p.cedula, 
                 p.telefono, 
-                c.nombre AS cargo,
-                p.proceso
+                c.nombre AS cargo
             FROM personal p
             LEFT JOIN p_cargo c ON p.cargo_id = c.id
             WHERE p.id = :id

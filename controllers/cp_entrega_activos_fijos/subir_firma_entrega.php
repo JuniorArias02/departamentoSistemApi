@@ -2,7 +2,6 @@
 require_once '../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/cors.php';
 
-// Validar campos obligatorios
 if (!isset($_POST['id']) || empty($_POST['id'])) {
 	http_response_code(400);
 	echo json_encode(["error" => "El id de la entrega es obligatorio"]);
@@ -11,18 +10,16 @@ if (!isset($_POST['id']) || empty($_POST['id'])) {
 
 $id = intval($_POST['id']);
 $ext_permitidas = ['png'];
-$rutas = [];
-
-// Carpeta destino
 $directorio = __DIR__ . '/../../public/entrega_activos/';
+
 if (!file_exists($directorio)) {
 	mkdir($directorio, 0755, true);
 }
 
-// Función para guardar firma
-function guardarFirma($campo, $file, $directorio, $ext_permitidas) {
+function guardarFirma($campo, $file, $directorio, $ext_permitidas)
+{
 	if (!isset($_FILES[$file]) || $_FILES[$file]['error'] !== UPLOAD_ERR_OK) {
-		return null; // No se mandó esa firma, se ignora
+		return false;
 	}
 
 	$extension = strtolower(pathinfo($_FILES[$file]['name'], PATHINFO_EXTENSION));
@@ -45,28 +42,35 @@ function guardarFirma($campo, $file, $directorio, $ext_permitidas) {
 	return $ruta_relativa;
 }
 
-// Procesar firmas
+// --- NUEVO: obtener las firmas actuales ---
+$stmt = $pdo->prepare("SELECT firma_quien_entrega, firma_quien_recibe FROM cp_entrega_activos_fijos WHERE id = ?");
+$stmt->execute([$id]);
+$firmaActual = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// --- procesar nuevas ---
 $firmaEntrega = guardarFirma("firma_entrega", "firma_entrega", $directorio, $ext_permitidas);
 $firmaRecibe  = guardarFirma("firma_recibe", "firma_recibe", $directorio, $ext_permitidas);
 
+// --- mantener las existentes si no llegan nuevas ---
+if ($firmaEntrega === false && !empty($firmaActual['firma_quien_entrega'])) {
+	$firmaEntrega = $firmaActual['firma_quien_entrega'];
+}
+if ($firmaRecibe === false && !empty($firmaActual['firma_quien_recibe'])) {
+	$firmaRecibe = $firmaActual['firma_quien_recibe'];
+}
+
 try {
-	$campos = [];
-	$params = [":id" => $id];
+	$sql = "UPDATE cp_entrega_activos_fijos 
+			SET firma_quien_entrega = :firma_entrega, 
+			    firma_quien_recibe = :firma_recibe 
+			WHERE id = :id";
 
-	if ($firmaEntrega) {
-		$campos[] = "firma_quien_entrega = :firma_entrega";
-		$params[":firma_entrega"] = $firmaEntrega;
-	}
-	if ($firmaRecibe) {
-		$campos[] = "firma_quien_recibe = :firma_recibe";
-		$params[":firma_recibe"] = $firmaRecibe;
-	}
-
-	if (!empty($campos)) {
-		$sql = "UPDATE cp_entrega_activos_fijos SET " . implode(", ", $campos) . " WHERE id = :id";
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute($params);
-	}
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute([
+		':firma_entrega' => $firmaEntrega,
+		':firma_recibe'  => $firmaRecibe,
+		':id'            => $id
+	]);
 
 	echo json_encode([
 		"success" => true,
@@ -74,10 +78,7 @@ try {
 		"ruta_entrega" => $firmaEntrega,
 		"ruta_recibe"  => $firmaRecibe
 	]);
-
 } catch (PDOException $e) {
 	http_response_code(500);
-	echo json_encode([
-		"error" => "Error al guardar firmas: " . $e->getMessage()
-	]);
+	echo json_encode(["error" => "Error al guardar firmas: " . $e->getMessage()]);
 }

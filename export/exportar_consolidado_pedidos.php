@@ -36,7 +36,11 @@ SELECT
         SELECT GROUP_CONCAT(i.nombre SEPARATOR ', ')
         FROM cp_items_pedidos i
         WHERE i.cp_pedido = p.id
-    ) AS DESCRIPCION
+    ) AS DESCRIPCION,
+     p.fecha_solicitud_cotizacion AS FECHA_SOLICITUD_COTIZACION,
+     p.fecha_respuesta_cotizacion AS FECHA_RESPUESTA_COTIZACION,
+     p.firma_aprobacion_orden AS FIRMA_APROBACION_ORDEN,
+     p.fecha_envio_proveedor AS FECHA_ENVIO_PROVEEDOR
 FROM 
     cp_pedidos p
 LEFT JOIN 
@@ -79,6 +83,10 @@ foreach ($pedidos as $i => $pedido) {
     $sheet->setCellValue("F{$row}", $pedido['OBSERVACION']);
     $sheet->setCellValue("G{$row}", $pedido['TIPO_COMPRA']);
     $sheet->setCellValue("H{$row}", $pedido['APROBACION']);
+    $sheet->setCellValue("I{$row}", $pedido['FECHA_SOLICITUD_COTIZACION']);
+    $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA_COTIZACION']);
+    $sheet->setCellValue("K{$row}", $pedido['FIRMA_APROBACION_ORDEN']);
+    $sheet->setCellValue("L{$row}", $pedido['FECHA_ENVIO_PROVEEDOR']);
     $sheet->setCellValue("M{$row}", $pedido['FECHA_RESPUESTA']);
     $sheet->setCellValue("N{$row}", $pedido['OBSERVACIONES_PEDIDOS']);
     // insertarFirma($sheet, $pedido['FIRMA_RESPONSABLE'], "K{$row}");

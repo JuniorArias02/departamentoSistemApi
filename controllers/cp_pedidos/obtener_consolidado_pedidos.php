@@ -21,6 +21,10 @@ try {
             p.responsable_aprobacion_firma AS FIRMA_RESPONSABLE,
             p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE,
             p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS
+            p.fecha_solicitud_cotizacion AS FECHA_SOLICITUD_COTIZACION,
+            p.fecha_respuesta_cotizacion AS FECHA_RESPUESTA_COTIZACION,
+            p.firma_aprobacion_orden AS FIRMA_APROBACION_ORDEN,
+            p.fecha_envio_proveedor AS FECHA_ENVIO_PROVEEDOR
         FROM cp_pedidos p
         LEFT JOIN usuarios u ON u.id = p.elaborado_por
         LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud

@@ -7,6 +7,7 @@ try {
         SELECT 
             e.id AS entrega_id,
             e.fecha_entrega,
+            e.personal_id,
             e.firma_quien_entrega,
             e.firma_quien_recibe,
             p.id AS personal_id,
@@ -14,6 +15,7 @@ try {
             p.cedula AS personal_cedula,
             c.nombre AS cargo_nombre,
             e.sede_id,
+            e.proceso_solicitante,
 			s.nombre AS sede_nombre
         FROM cp_entrega_activos_fijos e
         LEFT JOIN personal p ON e.personal_id = p.id
