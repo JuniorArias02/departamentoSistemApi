@@ -8,6 +8,7 @@ try {
             e.id AS entrega_id,
             e.fecha_entrega,
             e.personal_id,
+            e.coordinador_id,
             e.firma_quien_entrega,
             e.firma_quien_recibe,
             p.id AS personal_id,

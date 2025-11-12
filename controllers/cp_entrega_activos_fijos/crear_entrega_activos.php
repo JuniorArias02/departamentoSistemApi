@@ -20,6 +20,7 @@ $personal_id        = (int)$data["personal_id"];
 $sede_id            = (int)$data["sede_id"];
 $fecha_entrega      = $data["fecha_entrega"];
 $proceso_solicitante = $data["proceso_solicitante"];
+$coordinador_id =  (int)$data["coordinador_id"];
 
 try {
 	if ($id) {
@@ -32,13 +33,14 @@ try {
 		$stmt = $pdo->prepare($sql);
 		$stmt->bindParam(":id", $id, PDO::PARAM_INT);
 	} else {
-		$sql = "INSERT INTO cp_entrega_activos_fijos (personal_id, sede_id, fecha_entrega, proceso_solicitante)
-				VALUES (:personal_id, :sede_id, :fecha_entrega, :proceso_solicitante)";
+		$sql = "INSERT INTO cp_entrega_activos_fijos (personal_id, coordinador_id, sede_id, fecha_entrega, proceso_solicitante)
+				VALUES (:personal_id,:coordinador_id , :sede_id, :fecha_entrega, :proceso_solicitante)";
 		$stmt = $pdo->prepare($sql);
 	}
 
 	// Bind comunes
 	$stmt->bindParam(":personal_id", $personal_id, PDO::PARAM_INT);
+	$stmt->bindParam(":coordinador_id", $coordinador_id, PDO::PARAM_INT);
 	$stmt->bindParam(":sede_id", $sede_id, PDO::PARAM_INT);
 	$stmt->bindParam(":fecha_entrega", $fecha_entrega, PDO::PARAM_STR);
 	$stmt->bindParam(":proceso_solicitante", $proceso_solicitante, PDO::PARAM_STR);
