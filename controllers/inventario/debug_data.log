@@ -1,25 +1,24 @@
 Array
 (
-    [id] => 3
-    [codigo] => ME10057
-    [nombre] => ESCRITORIO DE MADERA 3 GABETAS
-    [dependencia] => FISIOTERAPIA
-    [responsable] => MAITY ROJAS
-    [marca] => N/A
-    [modelo] => N/A
-    [serial] => N/A
-    [sede_id] => 3
+    [codigo] => pruebas20*
+    [nombre] => hopla
+    [dependencia] => HIDROTERAPIA
+    [responsable] => 947
+    [marca] => aefae
+    [modelo] => faefa
+    [serial] => faefa
+    [sede_id] => 2
     [codigo_barras] => 
-    [grupo] => 
+    [grupo] => MAQ
     [vida_util] => 
     [vida_util_niff] => 
     [centro_costo] => 
     [ubicacion] => 
-    [proveedor] => 
+    [proveedor] => fae
     [fecha_compra] => 
     [soporte] => 
     [descripcion] => 
-    [estado] => 
+    [estado] => NUEVO
     [escritura] => 
     [matricula] => 
     [valor_compra] => 
@@ -32,9 +31,7 @@ Array
     [calibrado] => 
     [observaciones] => 
     [tipo_bien] => 
-    [soporte_adjunto] => Array
-        (
-        )
-
+    [soporte_adjunto] => 
+    [accesorios] => aefaef
     [creado_por] => 8
 )

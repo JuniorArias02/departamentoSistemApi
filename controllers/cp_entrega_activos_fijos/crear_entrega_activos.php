@@ -25,26 +25,32 @@ $coordinador_id =  (int)$data["coordinador_id"];
 try {
 	if ($id) {
 		$sql = "UPDATE cp_entrega_activos_fijos 
-				SET personal_id = :personal_id, 
-					sede_id = :sede_id, 
-					fecha_entrega = :fecha_entrega,
-					proceso_solicitante = :proceso_solicitante
-				WHERE id = :id";
+            SET personal_id = :personal_id, 
+                sede_id = :sede_id, 
+                fecha_entrega = :fecha_entrega,
+                proceso_solicitante = :proceso_solicitante
+            WHERE id = :id";
 		$stmt = $pdo->prepare($sql);
 		$stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+		// Bind para UPDATE (sin coordinador_id)
+		$stmt->bindParam(":personal_id", $personal_id, PDO::PARAM_INT);
+		$stmt->bindParam(":sede_id", $sede_id, PDO::PARAM_INT);
+		$stmt->bindParam(":fecha_entrega", $fecha_entrega, PDO::PARAM_STR);
+		$stmt->bindParam(":proceso_solicitante", $proceso_solicitante, PDO::PARAM_STR);
 	} else {
 		$sql = "INSERT INTO cp_entrega_activos_fijos (personal_id, coordinador_id, sede_id, fecha_entrega, proceso_solicitante)
-				VALUES (:personal_id,:coordinador_id , :sede_id, :fecha_entrega, :proceso_solicitante)";
+            VALUES (:personal_id,:coordinador_id , :sede_id, :fecha_entrega, :proceso_solicitante)";
 		$stmt = $pdo->prepare($sql);
+
+		// Bind para INSERT (incluye coordinador_id)
+		$stmt->bindParam(":personal_id", $personal_id, PDO::PARAM_INT);
+		$stmt->bindParam(":coordinador_id", $coordinador_id, PDO::PARAM_INT);
+		$stmt->bindParam(":sede_id", $sede_id, PDO::PARAM_INT);
+		$stmt->bindParam(":fecha_entrega", $fecha_entrega, PDO::PARAM_STR);
+		$stmt->bindParam(":proceso_solicitante", $proceso_solicitante, PDO::PARAM_STR);
 	}
-
-	// Bind comunes
-	$stmt->bindParam(":personal_id", $personal_id, PDO::PARAM_INT);
-	$stmt->bindParam(":coordinador_id", $coordinador_id, PDO::PARAM_INT);
-	$stmt->bindParam(":sede_id", $sede_id, PDO::PARAM_INT);
-	$stmt->bindParam(":fecha_entrega", $fecha_entrega, PDO::PARAM_STR);
-	$stmt->bindParam(":proceso_solicitante", $proceso_solicitante, PDO::PARAM_STR);
-
+ 
 	if ($stmt->execute()) {
 		if ($id) {
 			echo json_encode([
