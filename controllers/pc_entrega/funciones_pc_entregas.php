@@ -10,7 +10,7 @@ function validarCampos($input, $requeridos) {
 	return $faltantes;
 }
 
-function guardarFirmaBase64($base64_string, $prefijo = "firma") {
+function guardarFirmaBase64($base64_string, $dan = "firma") {
 	$directorio = __DIR__ . '/../../public/firmas/';
 	if (!file_exists($directorio)) {
 		mkdir($directorio, 0755, true);
@@ -24,7 +24,7 @@ function guardarFirmaBase64($base64_string, $prefijo = "firma") {
 
 	if ($data === false) return null;
 
-	$nombre = uniqid($prefijo . "_") . ".png";
+	$nombre = uniqid($dan . "_") . ".png";
 	$ruta = $directorio . $nombre;
 
 	if (file_put_contents($ruta, $data)) {

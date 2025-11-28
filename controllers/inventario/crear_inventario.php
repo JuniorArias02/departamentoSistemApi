@@ -46,6 +46,7 @@ try {
             nombre = :nombre,
             dependencia = :dependencia,
             responsable = :responsable,
+            coordinador_id = :coordinador_id,
             marca = :marca,
             modelo = :modelo,
             serial = :serial,
@@ -91,6 +92,7 @@ try {
             "nombre" => $data["nombre"],
             "dependencia" => $data["dependencia"] ?? null,
             "responsable" => $data["responsable"] ?? null,
+            "coordinador_id" => $data["coordinador_id"] ?? null,
             "marca" => $data["marca"] ?? null,
             "modelo" => $data["modelo"] ?? null,
             "serial" => $data["serial"] ?? null,
@@ -161,13 +163,13 @@ try {
 
         // CREAR NUEVO INVENTARIO
         $stmt = $pdo->prepare("INSERT INTO inventario 
-            (codigo, nombre, dependencia, responsable, marca, modelo, serial, sede_id, creado_por,
+            (codigo, nombre, dependencia, responsable,coordinador_id, marca, modelo, serial, sede_id, creado_por,
              codigo_barras, num_factu, grupo, vida_util, vida_util_niff, centro_costo, ubicacion, proveedor,
              fecha_compra, soporte, descripcion, estado, escritura, matricula, valor_compra,
              salvamenta, depreciacion, depreciacion_niif, meses, meses_niif, tipo_adquisicion,
              calibrado, observaciones, tipo_bien)
             VALUES 
-            (:codigo, :nombre, :dependencia, :responsable, :marca, :modelo, :serial, :sede_id, :creado_por,
+            (:codigo, :nombre, :dependencia, :responsable, :coordinador_id , :marca, :modelo, :serial, :sede_id, :creado_por,
              :codigo_barras, :num_factu, :grupo, :vida_util, :vida_util_niff, :centro_costo, :ubicacion, :proveedor,
              :fecha_compra, :soporte, :descripcion, :estado, :escritura, :matricula, :valor_compra,
              :salvamenta, :depreciacion, :depreciacion_niif, :meses, :meses_niif, :tipo_adquisicion,
@@ -191,6 +193,7 @@ try {
             "nombre" => $data["nombre"],
             "dependencia" => $data["dependencia"] ?? null,
             "responsable" => $data["responsable"] ?? null,
+            "coordinador_id" => $data["coordinador_id"] ?? null,
             "marca" => $data["marca"] ?? null,
             "modelo" => $data["modelo"] ?? null,
             "serial" => $data["serial"] ?? null,
@@ -255,3 +258,4 @@ try {
     http_response_code(500);
     echo json_encode(["error" => "Error al guardar el inventario: " . $e->getMessage()]);
 }
+
