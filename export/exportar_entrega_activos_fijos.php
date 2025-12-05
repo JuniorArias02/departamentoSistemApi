@@ -22,17 +22,23 @@ $sqlEntrega = "SELECT
     ef.fecha_entrega,
     ef.firma_quien_entrega,
     ef.firma_quien_recibe,
-    s.nombre as sede,
-    p.nombre as personal,
+    s.nombre AS sede,
+    p.nombre AS personal,
     p.cedula,
-    c.nombre as cargo,
-	dep.nombre as dependencia
+    c.nombre AS cargo,
+    dep.nombre AS dependencia,
+    coord.nombre AS coordinador
+
 FROM cp_entrega_activos_fijos ef
 LEFT JOIN personal p ON p.id = ef.personal_id
 LEFT JOIN sedes s ON s.id = ef.sede_id
 LEFT JOIN p_cargo c ON c.id = p.cargo_id
 LEFT JOIN dependencias_sedes dep ON dep.id = ef.proceso_solicitante
-WHERE ef.id = :id";
+
+LEFT JOIN personal coord ON coord.id = ef.coordinador_id
+
+WHERE ef.id = :id;
+";
 
 $stmt = $pdo->prepare($sqlEntrega);
 $stmt->execute([':id' => $idEntrega]);
@@ -52,6 +58,7 @@ $sqlItems = "SELECT
 	i.estado
 FROM cp_entrega_activos_fijos_items efi
 LEFT JOIN inventario i ON i.id = efi.item_id
+LEFT JOIN personal coord ON coord.id = i.coordinador_id
 WHERE efi.entrega_activos_id = :id";
 
 $stmt2 = $pdo->prepare($sqlItems);
@@ -66,12 +73,11 @@ if ($entrega) {
 	$sheet->setCellValue("B8", $fecha->format("d"));
 	$sheet->setCellValue("C8", $fecha->format("m"));
 	$sheet->setCellValue("D8", $fecha->format("Y"));
-
+	$sheet->setCellValue("O6", $entrega['coordinador']);
 	$sheet->setCellValue("O8", $entrega['sede']);
 	$sheet->setCellValue("H6", $entrega['personal']);
 	$sheet->setCellValue("H7", $entrega['cedula']);
 	$sheet->setCellValue("H8", $entrega['cargo']);
-
 	$sheet->setCellValue("O7", $entrega['dependencia']);
 
 	// firmas

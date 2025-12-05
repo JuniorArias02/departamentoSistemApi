@@ -1,24 +1,24 @@
 Array
 (
-    [codigo] => depenPurbe*2
-    [nombre] => depenPurbe*2
-    [dependencia] => 40
-    [responsable] => 1379
-    [marca] => depenPurbe*2
-    [modelo] => depenPurbe*2
-    [serial] => depenPurbe*2
-    [sede_id] => 3
-    [codigo_barras] => 
-    [grupo] => MAQ
+    [codigo] => PREUBAS0312**
+    [nombre] => ADAPTADOR USB A T
+    [dependencia] => 30
+    [responsable] => 
+    [marca] => HP
+    [modelo] => PREUBAS0312**
+    [serial] => PREUBAS0312**
+    [sede_id] => 1
+    [codigo_barras] => ACT0226
+    [grupo] => ME
     [vida_util] => 
     [vida_util_niff] => 
     [centro_costo] => 
     [ubicacion] => 
-    [proveedor] => depenPurbe*2
+    [proveedor] => PREUBAS0312**
     [fecha_compra] => 
     [soporte] => 
     [descripcion] => 
-    [estado] => NUEVO
+    [estado] => 
     [escritura] => 
     [matricula] => 
     [valor_compra] => 
@@ -33,5 +33,6 @@ Array
     [tipo_bien] => 
     [soporte_adjunto] => 
     [coordinador_id] => 1379
+    [num_factu] => PREUBAS0312**
     [creado_por] => 8
 )
