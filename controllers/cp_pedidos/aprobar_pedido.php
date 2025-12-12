@@ -18,7 +18,7 @@ if (!$data) {
 
 $usuarioId = $data['id_usuario'] ?? null;
 $tipoAprobacion = $data['tipo'] ?? 'compra';
-$motivo = $data['motivo_aprobacion'] ?? null; // <-- Nuevo campo opcional
+$motivo = $data['motivo_aprobacion'] ?? null; 
 
 // Permiso para aprobar
 if (!tienePermiso($pdo, $usuarioId, PERMISOS['GESTION_COMPRA_PEDIDOS']['APROBAR_PEDIDO'])) {

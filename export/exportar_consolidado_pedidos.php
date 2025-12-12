@@ -83,12 +83,12 @@ foreach ($pedidos as $i => $pedido) {
     $sheet->setCellValue("F{$row}", $pedido['OBSERVACION']);
     $sheet->setCellValue("G{$row}", $pedido['TIPO_COMPRA']);
     $sheet->setCellValue("H{$row}", $pedido['APROBACION']);
-    $sheet->setCellValue("I{$row}", $pedido['FECHA_SOLICITUD_COTIZACION']);
-    $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA_COTIZACION']);
-    $sheet->setCellValue("K{$row}", $pedido['FIRMA_APROBACION_ORDEN']);
-    $sheet->setCellValue("L{$row}", $pedido['FECHA_ENVIO_PROVEEDOR']);
-    $sheet->setCellValue("M{$row}", $pedido['FECHA_RESPUESTA']);
-    $sheet->setCellValue("N{$row}", $pedido['OBSERVACIONES_PEDIDOS']);
+    // $sheet->setCellValue("I{$row}", $pedido['FECHA_SOLICITUD_COTIZACION']);
+    // $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA_COTIZACION']);
+    // $sheet->setCellValue("K{$row}", $pedido['FIRMA_APROBACION_ORDEN']);
+    // $sheet->setCellValue("L{$row}", $pedido['FECHA_ENVIO_PROVEEDOR']);
+    $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA']);
+    $sheet->setCellValue("K{$row}", $pedido['OBSERVACIONES_PEDIDOS']);
     // insertarFirma($sheet, $pedido['FIRMA_RESPONSABLE'], "K{$row}");
 }
 

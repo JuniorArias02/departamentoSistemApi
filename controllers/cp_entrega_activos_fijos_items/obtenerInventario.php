@@ -11,49 +11,53 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Recibir JSON
 $input = json_decode(file_get_contents("php://input"), true);
 
-$coordinador_id = $input['coordinador_id'] ?? null;
-$dependencia_id = $input['dependencia_id'] ?? null;
-$sede_id        = $input['sede_id'] ?? null;
+// Campos esperados
+$requiredFields = [
+    "responsable_id",
+    "coordinador_id",
+    "dependencia_id"
+];
 
-// Validar
-if (!$coordinador_id || !$dependencia_id || !$sede_id) {
+$missing = [];
+
+// Validar cuáles faltan
+foreach ($requiredFields as $field) {
+    if (!isset($input[$field]) || $input[$field] === "" || $input[$field] === null) {
+        $missing[] = $field;
+    }
+}
+
+if (!empty($missing)) {
     http_response_code(400);
     echo json_encode([
         "success" => false,
-        "error" => "Faltan filtros obligatorios: coordinador_id, dependencia_id, sede_id"
+        "error" => "Faltan campos obligatorios",
+        "missing_fields" => $missing
     ]);
     exit;
 }
 
-try {
+$responsable_id = $input['responsable_id'];
+$coordinador_id = $input['coordinador_id'];
+$proceso_id     = $input['dependencia_id'];
 
-    $sql = "SELECT * FROM inventario 
-            WHERE coordinador_id = :coordinador_id
-            AND dependencia = :dependencia_id
-            AND sede_id = :sede_id";
+$sql = "SELECT * FROM inventario 
+        WHERE coordinador_id = :coordinador_id
+        AND responsable_id = :responsable_id
+        AND proceso_id = :proceso_id";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':coordinador_id', $coordinador_id, PDO::PARAM_INT);
-    $stmt->bindParam(':dependencia_id', $dependencia_id, PDO::PARAM_INT);
-    $stmt->bindParam(':sede_id', $sede_id, PDO::PARAM_INT);
+$stmt = $pdo->prepare($sql);
 
-    $stmt->execute();
+$stmt->bindParam(':coordinador_id', $coordinador_id, PDO::PARAM_INT);
+$stmt->bindParam(':responsable_id', $responsable_id, PDO::PARAM_INT);
+$stmt->bindParam(':proceso_id', $proceso_id, PDO::PARAM_INT);
 
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute();
+$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-} catch (Exception $e) {
-
-    http_response_code(500);
-    echo json_encode([
-        "success" => false,
-        "error" => "Error en el servidor",
-        "details" => $e->getMessage()
-    ]);
-}
+echo json_encode([
+    "success" => true,
+    "data" => $data
+]);
