@@ -25,6 +25,7 @@ $headers = [
     "Vida Útil NIIF",
     "Dependencia",
     "Responsable",
+    "Coordinador",
     "Centro de Costo",
     "Ubicación",
     "Proveedor",
@@ -62,14 +63,57 @@ foreach ($headers as $header) {
 
 // Consulta completa del inventario (excepto ID)
 $sql = "SELECT 
-  i.codigo, i.codigo_barras, i.nombre, i.grupo, i.vida_util, i.vida_util_niff,
-  i.dependencia, i.responsable, i.centro_costo, i.ubicacion, i.proveedor, i.fecha_compra,
-  i.soporte, i.descripcion, i.estado, i.marca, i.modelo, i.serial,
-  i.escritura, i.matricula, i.valor_compra, i.salvamenta, i.depreciacion,
-  i.depreciacion_niif, i.meses, i.meses_niif, i.tipo_adquisicion, i.calibrado,
-  s.nombre AS sede_nombre
+  i.codigo,
+  i.codigo_barras,
+  i.nombre,
+  i.grupo,
+  i.vida_util,
+  i.vida_util_niff,
+  i.dependencia,
+  i.responsable,
+  i.centro_costo,
+  i.ubicacion,
+  i.proveedor,
+  i.fecha_compra,
+  i.soporte,
+  i.descripcion,
+  i.estado,
+  i.marca,
+  i.modelo,
+  i.serial,
+  i.escritura,
+  i.matricula,
+  i.valor_compra,
+  i.salvamenta,
+  i.depreciacion,
+  i.depreciacion_niif,
+  i.meses,
+  i.meses_niif,
+  i.tipo_adquisicion,
+  i.calibrado,
+
+  s.nombre AS sede_nombre,
+
+  pr.nombre AS responsable_nombre,
+  pc.nombre AS coordinador_nombre,
+
+  pro.nombre AS proceso_nombre
+
+
 FROM inventario i
-LEFT JOIN sedes s ON i.sede_id = s.id";
+LEFT JOIN sedes s 
+  ON i.sede_id = s.id
+
+LEFT JOIN personal pr 
+  ON i.responsable_id = pr.id
+
+LEFT JOIN personal pc 
+  ON i.coordinador_id = pc.id
+
+LEFT JOIN dependencias_sedes pro 
+  ON i.proceso_id = pro.id;
+
+";
 
 $stmt = $pdo->query($sql);
 
@@ -98,7 +142,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $sheet->setCellValue($col++ . $rowNum, formatDate($row['vida_util']));
     $sheet->setCellValue($col++ . $rowNum, formatDate($row['vida_util_niff']));
     $sheet->setCellValue($col++ . $rowNum, $row['dependencia']);
-    $sheet->setCellValue($col++ . $rowNum, $row['responsable']);
+    $sheet->setCellValue($col++ . $rowNum, $row['responsable_nombre']);
+    $sheet->setCellValue($col++ . $rowNum, $row['coordinador_nombre']);
+    $sheet->setCellValue($col++ . $rowNum, $row['proceso_nombre']);
     $sheet->setCellValue($col++ . $rowNum, $row['centro_costo']);
     $sheet->setCellValue($col++ . $rowNum, $row['ubicacion']);
     $sheet->setCellValue($col++ . $rowNum, $row['proveedor']);
@@ -144,7 +190,7 @@ for ($i = 1; $i <= $colCount; $i++) {
     $colLetter = Coordinate::stringFromColumnIndex($i);
     $sheet->getColumnDimension($colLetter)->setAutoSize(true);
 }
-    
+
 // Configurar hoja para mejor visualización
 $sheet->setAutoFilter("A1:{$lastColLetter}1");
 $sheet->freezePane('A2');
@@ -157,4 +203,3 @@ header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 exit;
-
