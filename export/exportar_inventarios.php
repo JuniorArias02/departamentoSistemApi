@@ -26,6 +26,7 @@ $headers = [
     "Dependencia",
     "Responsable",
     "Coordinador",
+    "Proceso",
     "Centro de Costo",
     "Ubicación",
     "Proveedor",
