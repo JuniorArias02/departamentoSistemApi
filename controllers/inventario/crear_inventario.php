@@ -46,10 +46,12 @@ try {
             nombre = :nombre,
             dependencia = :dependencia,
             responsable = :responsable,
+            responsable_id = :responsable_id,
             coordinador_id = :coordinador_id,
             marca = :marca,
             modelo = :modelo,
             serial = :serial,
+            proceo_id = :proceso_id,
             sede_id = :sede_id,
             codigo_barras = :codigo_barras,
             num_factu = :num_factu,
@@ -92,10 +94,12 @@ try {
             "nombre" => $data["nombre"],
             "dependencia" => $data["dependencia"] ?? null,
             "responsable" => $data["responsable"] ?? null,
+            "responsable_id" => $data["responsable_id"] ?? null,
             "coordinador_id" => $data["coordinador_id"] ?? null,
             "marca" => $data["marca"] ?? null,
             "modelo" => $data["modelo"] ?? null,
             "serial" => $data["serial"] ?? null,
+            "proceso_id" => $data["proceso_id"] ?? null,                                    
             "sede_id" => $data["sede_id"] ?? null,
             "codigo_barras" => $data["codigo_barras"] ?? null,
             "num_factu" => $data["num_factu"] ?? null,
@@ -163,13 +167,13 @@ try {
 
         // CREAR NUEVO INVENTARIO
         $stmt = $pdo->prepare("INSERT INTO inventario 
-            (codigo, nombre, dependencia, responsable,coordinador_id, marca, modelo, serial, sede_id, creado_por,
+            (codigo, nombre, dependencia, responsable, responsable_id,coordinador_id, marca, modelo, serial,proceso_id, sede_id, creado_por,
              codigo_barras, num_factu, grupo, vida_util, vida_util_niff, centro_costo, ubicacion, proveedor,
              fecha_compra, soporte, descripcion, estado, escritura, matricula, valor_compra,
              salvamenta, depreciacion, depreciacion_niif, meses, meses_niif, tipo_adquisicion,
              calibrado, observaciones, tipo_bien)
             VALUES 
-            (:codigo, :nombre, :dependencia, :responsable, :coordinador_id , :marca, :modelo, :serial, :sede_id, :creado_por,
+            (:codigo, :nombre, :dependencia, :responsable, :responsable_id, :coordinador_id , :marca, :modelo, :serial,:proceso_id, :sede_id, :creado_por,
              :codigo_barras, :num_factu, :grupo, :vida_util, :vida_util_niff, :centro_costo, :ubicacion, :proveedor,
              :fecha_compra, :soporte, :descripcion, :estado, :escritura, :matricula, :valor_compra,
              :salvamenta, :depreciacion, :depreciacion_niif, :meses, :meses_niif, :tipo_adquisicion,
@@ -193,10 +197,12 @@ try {
             "nombre" => $data["nombre"],
             "dependencia" => $data["dependencia"] ?? null,
             "responsable" => $data["responsable"] ?? null,
+            "responsable_id" => $data["responsable_id"] ?? null,
             "coordinador_id" => $data["coordinador_id"] ?? null,
             "marca" => $data["marca"] ?? null,
             "modelo" => $data["modelo"] ?? null,
             "serial" => $data["serial"] ?? null,
+            "proceso_id" => $data["proceso_id"] ?? null,
             "sede_id" => $data["sede_id"] ?? null,
             "creado_por" => $data["creado_por"],
             "codigo_barras" => $data["codigo_barras"] ?? null,
@@ -258,4 +264,3 @@ try {
     http_response_code(500);
     echo json_encode(["error" => "Error al guardar el inventario: " . $e->getMessage()]);
 }
-

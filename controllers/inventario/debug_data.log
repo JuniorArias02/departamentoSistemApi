@@ -1,24 +1,25 @@
 Array
 (
-    [codigo] => PREUBAS0312**
-    [nombre] => ADAPTADOR USB A T
-    [dependencia] => 30
+    [codigo] => 15d
+    [nombre] => PROTECCION REJA DE TECHO  TUBO DE 1  1/2  X 2  1/2 LARGO 2,33 Y 1,70.
+    [dependencia] => 
     [responsable] => 
-    [marca] => HP
-    [modelo] => PREUBAS0312**
-    [serial] => PREUBAS0312**
+    [responsable_id] => 1379
+    [marca] => Marca
+    [modelo] => Modelo
+    [serial] => Serial
     [sede_id] => 1
-    [codigo_barras] => ACT0226
+    [codigo_barras] => ACT0370
     [grupo] => ME
     [vida_util] => 
     [vida_util_niff] => 
     [centro_costo] => 
     [ubicacion] => 
-    [proveedor] => PREUBAS0312**
+    [proveedor] => Proveedor
     [fecha_compra] => 
     [soporte] => 
     [descripcion] => 
-    [estado] => 
+    [estado] => BUEN ESTADO
     [escritura] => 
     [matricula] => 
     [valor_compra] => 
@@ -33,6 +34,7 @@ Array
     [tipo_bien] => 
     [soporte_adjunto] => 
     [coordinador_id] => 1379
-    [num_factu] => PREUBAS0312**
+    [num_factu] => facturas
+    [proceso_id] => 30
     [creado_por] => 8
 )
