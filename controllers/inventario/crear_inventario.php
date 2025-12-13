@@ -51,7 +51,7 @@ try {
             marca = :marca,
             modelo = :modelo,
             serial = :serial,
-            proceo_id = :proceso_id,
+            proceso_id = :proceso_id,
             sede_id = :sede_id,
             codigo_barras = :codigo_barras,
             num_factu = :num_factu,
