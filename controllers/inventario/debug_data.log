@@ -1,25 +1,26 @@
 Array
 (
-    [codigo] => 15d
-    [nombre] => PROTECCION REJA DE TECHO  TUBO DE 1  1/2  X 2  1/2 LARGO 2,33 Y 1,70.
-    [dependencia] => 
-    [responsable] => 
-    [responsable_id] => 1379
-    [marca] => Marca
-    [modelo] => Modelo
-    [serial] => Serial
-    [sede_id] => 1
-    [codigo_barras] => ACT0370
-    [grupo] => ME
+    [id] => 3
+    [codigo] => ME10057
+    [nombre] => ESCRITORIO DE MADERA 3 GABETAS
+    [dependencia] => FISIOTERAPIA
+    [responsable] => ROJAS GARAY MAITY JULIANA
+    [responsable_id] => 915
+    [marca] => N/A
+    [modelo] => N/A
+    [serial] => N/A
+    [sede_id] => 3
+    [codigo_barras] => 
+    [grupo] => 
     [vida_util] => 
     [vida_util_niff] => 
     [centro_costo] => 
     [ubicacion] => 
-    [proveedor] => Proveedor
+    [proveedor] => 
     [fecha_compra] => 
     [soporte] => 
     [descripcion] => 
-    [estado] => BUEN ESTADO
+    [estado] => 
     [escritura] => 
     [matricula] => 
     [valor_compra] => 
@@ -33,8 +34,8 @@ Array
     [observaciones] => 
     [tipo_bien] => 
     [soporte_adjunto] => 
-    [coordinador_id] => 1379
-    [num_factu] => facturas
-    [proceso_id] => 30
+    [coordinador_id] => 915
+    [proceso_id] => 41
+    [proceso_solicitante] => 
     [creado_por] => 8
 )

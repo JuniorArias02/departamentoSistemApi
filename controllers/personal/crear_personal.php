@@ -2,8 +2,6 @@
 require_once __DIR__ . '/../../database/conexion.php';
 require_once __DIR__ . '/../../middlewares/headers_post.php';
 require_once __DIR__ . '/../utils/registrar_actividad.php';
-require_once __DIR__ . '/../rol/permisos/permisos.php';
-require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -17,17 +15,17 @@ if (!$usuario_id) {
     exit;
 }
 
-// Validar campos requeridos
-$requeridos = ["nombre"];
+// Campos requeridos
+$requeridos = ["nombre", "cedula", "telefono", "cargo_id"];
 $faltantes = [];
 
 foreach ($requeridos as $campo) {
-    if (!isset($data[$campo]) || trim($data[$campo]) === "") {
+    if (empty($data[$campo])) {
         $faltantes[] = $campo;
     }
 }
 
-if (!empty($faltantes)) {
+if ($faltantes) {
     echo json_encode([
         "status" => false,
         "message" => "Campos faltantes",
@@ -39,9 +37,9 @@ if (!empty($faltantes)) {
 try {
     $stmt = $pdo->prepare("
         INSERT INTO personal (
-            nombre, cedula, telefono, cargo, proceso
+            nombre, cedula, telefono, cargo_id
         ) VALUES (
-            :nombre, :cedula, :telefono, :cargo, :proceso
+            :nombre, :cedula, :telefono, :cargo_id
         )
     ");
 
@@ -49,8 +47,7 @@ try {
         "nombre"   => $data["nombre"],
         "cedula"   => $data["cedula"],
         "telefono" => $data["telefono"],
-        "cargo"    => $data["cargo"],
-        "proceso"  => $data["proceso"]
+        "cargo_id" => $data["cargo_id"]
     ]);
 
     $nuevo_id = $pdo->lastInsertId();
@@ -59,12 +56,13 @@ try {
 
     echo json_encode([
         "status" => true,
-        "message" => "Personal registrado correctamente"
+        "message" => "Personal registrado correctamente",
+        "id" => $nuevo_id
     ]);
-    
+
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        "message" => "Error al registrar el personal: " . $e->getMessage()
+        "message" => "Error al registrar el personal"
     ]);
 }
