@@ -89,7 +89,8 @@ if ($totalItems > $filasPlantilla) {
 
 
 $merges = [
-	'B:D', // nombre
+	'B:D', 
+	'E:F',
 ];
 
 foreach ($items as $i => $item) {
