@@ -77,7 +77,9 @@ try {
             calibrado = :calibrado,
             observaciones = :observaciones,
             fecha_actualizacion = NOW(),
-            tipo_bien = :tipo_bien
+            tipo_bien = :tipo_bien,
+            tiene_accesorio = :tiene_accesorio,
+            descripcion_accesorio = :descripcion_accesorio
             WHERE id = :id");
 
         if (!tienePermiso($pdo, $data['creado_por'], PERMISOS['INVENTARIO']['EDITAR'])) {
@@ -125,6 +127,8 @@ try {
             "calibrado" => !empty($data["calibrado"]) ? $data["calibrado"] : null,
             "observaciones" => $data["observaciones"] ?? null,
             "tipo_bien" => $data["tipo_bien"] ?? null,
+            "tiene_accesorio" => $data["tiene_accesorio"] ?? null,
+            "descripcion_accesorio" => $data["descripcion_accesorio"] ?? null,
             "id" => $data["id"]
         ]);
 
@@ -171,13 +175,13 @@ try {
              codigo_barras, num_factu, grupo, vida_util, vida_util_niff, centro_costo, ubicacion, proveedor,
              fecha_compra, soporte, descripcion, estado, escritura, matricula, valor_compra,
              salvamenta, depreciacion, depreciacion_niif, meses, meses_niif, tipo_adquisicion,
-             calibrado, observaciones, tipo_bien)
+             calibrado, observaciones, tipo_bien, tiene_accesorio, descripcion_accesorio)
             VALUES 
             (:codigo, :nombre, :dependencia, :responsable, :responsable_id, :coordinador_id , :marca, :modelo, :serial,:proceso_id, :sede_id, :creado_por,
              :codigo_barras, :num_factu, :grupo, :vida_util, :vida_util_niff, :centro_costo, :ubicacion, :proveedor,
              :fecha_compra, :soporte, :descripcion, :estado, :escritura, :matricula, :valor_compra,
              :salvamenta, :depreciacion, :depreciacion_niif, :meses, :meses_niif, :tipo_adquisicion,
-             :calibrado, :observaciones , :tipo_bien)");
+             :calibrado, :observaciones , :tipo_bien, :tiene_accesorio, :descripcion_accesorio)");
 
 
         $valorCompra = str_replace(',', '.', $data["valor_compra"]);
@@ -228,7 +232,9 @@ try {
             "tipo_adquisicion" => $data["tipo_adquisicion"] ?? null,
             "calibrado" => (!empty($data["calibrado"]) ? $data["calibrado"] : null),
             "observaciones" => $data["observaciones"] ?? null,
-            "tipo_bien" => $data["tipo_bien"] ?? null
+            "tipo_bien" => $data["tipo_bien"] ?? null,
+            "tiene_accesorio" => $data["tiene_accesorio"] ?? null,
+            "descripcion_accesorio" => $data["descripcion_accesorio"] ?? null,
         ]);
 
         if ($stmt->rowCount() === 0) {
