@@ -14,35 +14,49 @@ require_once __DIR__ . '/../../notificaciones/enviarCorreoNuevoPedidoGerenteCome
  * @param int|null $consecutivo
  * @return void
  */
-function notificarNuevoPedidoGerenteComercial($pdo, $fechaSolicitud, $procesoSolicitante, $tipoSolicitud, $observacion, $consecutivo = null)
+function notificarNuevoPedidoGerenteComercial(PDO $pdo, int $idPedido)
 {
     $permisoClave = PERMISOS['GESTION_COMPRA_PEDIDOS']['VER_PEDIDOS_ENCARGADO'];
 
-    // Buscar usuarios con el permiso
-    $sql = "SELECT u.nombre_completo, u.correo
-            FROM usuarios u
-            JOIN rol_permisos rp ON u.rol_id = rp.rol_id
-            JOIN permisos p ON rp.permiso_id = p.id
-            WHERE p.nombre = :permiso
-              AND u.estado = 1";
-    $stmt = $pdo->prepare($sql);
+    // Datos del pedido
+    $stmtPedido = $pdo->prepare("
+        SELECT 
+            p.fecha_solicitud,
+            ds.nombre AS proceso_solicitante,
+            ts.nombre AS tipo_solicitud,
+            p.observacion,
+            p.consecutivo
+        FROM cp_pedidos p
+        LEFT JOIN dependencias_sedes ds ON ds.id = p.proceso_solicitante
+        LEFT JOIN cp_tipo_solicitud ts ON ts.id = p.tipo_solicitud
+        WHERE p.id = :id
+    ");
+    $stmtPedido->execute([':id' => $idPedido]);
+    $pedido = $stmtPedido->fetch(PDO::FETCH_ASSOC);
+
+    if (!$pedido) return;
+
+    // Usuarios con permiso
+    $stmt = $pdo->prepare("
+        SELECT u.nombre_completo, u.correo
+        FROM usuarios u
+        JOIN rol_permisos rp ON u.rol_id = rp.rol_id
+        JOIN permisos p ON rp.permiso_id = p.id
+        WHERE p.nombre = :permiso
+          AND u.estado = 1
+    ");
     $stmt->execute(['permiso' => $permisoClave]);
     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Enviar correo a cada usuario
     foreach ($usuarios as $usuario) {
-        try {
-            enviarCorreoNuevoPedidoGerenteComercial(
-                $usuario['correo'],
-                $usuario['nombre_completo'],
-                $fechaSolicitud,
-                $procesoSolicitante,
-                $tipoSolicitud,
-                $observacion,
-                $consecutivo
-            );
-        } catch (Exception $e) {
-            error_log("Error enviando correo a {$usuario['correo']}: " . $e->getMessage());
-        }
+        enviarCorreoNuevoPedidoGerenteComercial(
+            $usuario['correo'],
+            $usuario['nombre_completo'],
+            $pedido['fecha_solicitud'],
+            $pedido['proceso_solicitante'],
+            $pedido['tipo_solicitud'],
+            $pedido['observacion'] ?? '',
+            $pedido['consecutivo']
+        );
     }
 }
