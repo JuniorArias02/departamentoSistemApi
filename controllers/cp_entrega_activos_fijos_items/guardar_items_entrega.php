@@ -29,15 +29,17 @@ try {
 
     // Iniciar transacción
     $pdo->beginTransaction();
-
-    $sql = "INSERT INTO cp_entrega_activos_fijos_items (item_id, entrega_activos_id)
-            VALUES (:item_id, :entrega_activos_id)";
+    $sql = "INSERT INTO cp_entrega_activos_fijos_items 
+        (item_id, entrega_activos_id, es_accesorio, accesorio_descripcion)
+        VALUES (:item_id, :entrega_activos_id, :es_accesorio, :accesorio_descripcion)";
     $stmt = $pdo->prepare($sql);
 
-    foreach ($items as $itemId) {
+    foreach ($items as $item) {
         $stmt->execute([
-            ':item_id' => $itemId,
-            ':entrega_activos_id' => $entrega_id
+            ':item_id' => $item['item_id'],
+            ':entrega_activos_id' => $entrega_id,
+            ':es_accesorio' => $item['es_accesorio'] ?? 0,
+            ':accesorio_descripcion' => $item['accesorio_descripcion'] ?? null
         ]);
     }
 

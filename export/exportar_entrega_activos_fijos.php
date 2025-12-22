@@ -84,23 +84,23 @@ $totalItems = count($items);
 
 if ($totalItems > $filasPlantilla) {
 	$filasExtra = $totalItems - $filasPlantilla;
+
+	// Inserta filas
 	$sheet->insertNewRowBefore($startRow + $filasPlantilla, $filasExtra);
+
+	// Reaplica merges SOLO a filas nuevas
+	for ($r = $startRow + $filasPlantilla; $r < $startRow + $totalItems; $r++) {
+		$sheet->mergeCells("B{$r}:D{$r}");
+		$sheet->mergeCells("E{$r}:F{$r}");
+	}
 }
-
-
-$merges = [
-	'B:D', 
-	'E:F',
-];
 
 foreach ($items as $i => $item) {
 	$row = $startRow + $i;
 
-	foreach ($merges as $merge) {
-		[$c1, $c2] = explode(':', $merge);
-		$sheet->mergeCells("{$c1}{$row}:{$c2}{$row}");
-	}
-
+	// ⚠️ NO merge aquí
+	$sheet->getRowDimension($row)->setVisible(true);
+	
 	$sheet->setCellValue("B{$row}", $item['nombre']);
 	$sheet->setCellValue("E{$row}", $item['proveedor']);
 	$sheet->setCellValue("G{$row}", $item['soporte']);
@@ -123,6 +123,7 @@ foreach ($items as $i => $item) {
 		->setHorizontal(Alignment::HORIZONTAL_CENTER)
 		->setVertical(Alignment::VERTICAL_CENTER);
 }
+
 
 // ======================= DESCARGAR EXCEL =======================
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
