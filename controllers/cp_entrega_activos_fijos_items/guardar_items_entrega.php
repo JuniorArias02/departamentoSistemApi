@@ -46,7 +46,7 @@ try {
     $pdo->commit();
 
     echo json_encode([
-        "success" => true,
+        "success" => true, 
         "message" => "Ítems guardados correctamente"
     ]);
 } catch (Exception $e) {

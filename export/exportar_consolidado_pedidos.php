@@ -87,7 +87,8 @@ foreach ($pedidos as $i => $pedido) {
     // $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA_COTIZACION']);
     // $sheet->setCellValue("K{$row}", $pedido['FIRMA_APROBACION_ORDEN']);
     // $sheet->setCellValue("L{$row}", $pedido['FECHA_ENVIO_PROVEEDOR']);
-    $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA']);
+    $sheet->setCellValue("I{$row}", $pedido['FECHA_RESPUESTA']);
+    $sheet->setCellValue("J{$row}", $pedido['FECHA_RESPUESTA_SOLICITANTE']);
     $sheet->setCellValue("K{$row}", $pedido['OBSERVACIONES_PEDIDOS']);
     // insertarFirma($sheet, $pedido['FIRMA_RESPONSABLE'], "K{$row}");
 }
