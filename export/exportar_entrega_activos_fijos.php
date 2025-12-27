@@ -47,7 +47,7 @@ $sqlItems = "SELECT
     efi.accesorio_descripcion,
     i.nombre,
     i.marca,
-	I.modelo,
+	i.modelo,
     i.serial,
     i.codigo,
     i.proveedor,
@@ -105,8 +105,8 @@ foreach ($items as $i => $item) {
 	$sheet->setCellValue("B{$row}", $item['nombre']);
 	$sheet->setCellValue("E{$row}", $item['proveedor']);
 	$sheet->setCellValue("G{$row}", $item['soporte']);
-	$sheet->setCellValue("H{$row}", $item['modelo']);
 	$sheet->setCellValue("H{$row}", $item['marca']);
+	$sheet->setCellValue("I{$row}", $item['modelo']);
 	$sheet->setCellValue("J{$row}", $item['serial']);
 	$sheet->setCellValue("K{$row}", $item['codigo']);
 
