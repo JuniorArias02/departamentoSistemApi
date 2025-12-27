@@ -130,8 +130,6 @@ foreach ($items as $i => $item) {
 
 
 // ======================= DESCARGAR EXCEL =======================
-// ======================= EXPORTAR A PDF =======================
-// ======================= DESCARGAR EXCEL =======================
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="entrega_activos_fijos.xlsx"');
 header('Cache-Control: max-age=0');
