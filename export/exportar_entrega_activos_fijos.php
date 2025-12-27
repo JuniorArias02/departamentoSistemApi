@@ -13,7 +13,8 @@ $spreadsheet = IOFactory::load($templatePath);
 $sheet = $spreadsheet->getActiveSheet();
 
 // ======================= ID ENTREGA =======================
-$idEntrega = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$idEntrega = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
+
 if ($idEntrega <= 0) {
 	die("ID de entrega inválido");
 }
@@ -52,7 +53,8 @@ $sqlItems = "SELECT
     i.codigo,
     i.proveedor,
     i.soporte,
-	i.observaciones
+	i.observaciones,
+	i.num_factu
 FROM cp_entrega_activos_fijos_items efi
 LEFT JOIN inventario i ON i.id = efi.item_id
 WHERE efi.entrega_activos_id = :id";
@@ -104,7 +106,7 @@ foreach ($items as $i => $item) {
 
 	$sheet->setCellValue("B{$row}", $item['nombre']);
 	$sheet->setCellValue("E{$row}", $item['proveedor']);
-	$sheet->setCellValue("G{$row}", $item['soporte']);
+	$sheet->setCellValue("G{$row}", $item['num_factu']);
 	$sheet->setCellValue("H{$row}", $item['marca']);
 	$sheet->setCellValue("I{$row}", $item['modelo']);
 	$sheet->setCellValue("J{$row}", $item['serial']);
@@ -128,6 +130,8 @@ foreach ($items as $i => $item) {
 
 
 // ======================= DESCARGAR EXCEL =======================
+// ======================= EXPORTAR A PDF =======================
+// ======================= DESCARGAR EXCEL =======================
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="entrega_activos_fijos.xlsx"');
 header('Cache-Control: max-age=0');
@@ -135,6 +139,7 @@ header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save("php://output");
 exit;
+
 
 // ======================= FIRMA =======================
 function insertarFirma($sheet, $rutaFirma, $celda, $offsetX = 250, $offsetY = 15)
