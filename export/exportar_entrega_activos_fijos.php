@@ -50,7 +50,8 @@ $sqlItems = "SELECT
     i.serial,
     i.codigo,
     i.proveedor,
-    i.soporte
+    i.soporte,
+	i.observaciones
 FROM cp_entrega_activos_fijos_items efi
 LEFT JOIN inventario i ON i.id = efi.item_id
 WHERE efi.entrega_activos_id = :id";
@@ -72,7 +73,6 @@ if ($entrega) {
 	$sheet->setCellValue("H7", $entrega['cedula']);
 	$sheet->setCellValue("H8", $entrega['cargo']);
 	$sheet->setCellValue("O7", $entrega['dependencia']);
-
 	insertarFirma($sheet, $entrega['firma_quien_entrega'], "H20", 5, 10);
 	insertarFirma($sheet, $entrega['firma_quien_recibe'], "S20", -10, 10);
 }
@@ -100,7 +100,7 @@ foreach ($items as $i => $item) {
 
 	// ⚠️ NO merge aquí
 	$sheet->getRowDimension($row)->setVisible(true);
-	
+
 	$sheet->setCellValue("B{$row}", $item['nombre']);
 	$sheet->setCellValue("E{$row}", $item['proveedor']);
 	$sheet->setCellValue("G{$row}", $item['soporte']);
@@ -117,7 +117,7 @@ foreach ($items as $i => $item) {
 
 	$sheet->setCellValue($item['es_accesorio'] ? "R{$row}" : "S{$row}", "X");
 	$sheet->setCellValue("T{$row}", $item['accesorio_descripcion']);
-
+	$sheet->setCellValue("U{$row}", $item['observaciones']);
 	$sheet->getStyle("B{$row}:T{$row}")
 		->getAlignment()
 		->setHorizontal(Alignment::HORIZONTAL_CENTER)
