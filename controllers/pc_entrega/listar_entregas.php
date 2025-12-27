@@ -24,8 +24,7 @@ try {
             e.fecha_entrega,
             e.firma_entrega,
             e.firma_recibe,
-            e.devuelto,
-
+            e.estado,
             eq.nombre_equipo,
             eq.marca AS equipo_marca,
             eq.modelo AS equipo_modelo,
