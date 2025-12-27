@@ -54,7 +54,9 @@ $sqlItems = "SELECT
     i.proveedor,
     i.soporte,
 	i.observaciones,
-	i.num_factu
+	i.num_factu,
+	i.estado,
+	i.descripcion_accesorio
 FROM cp_entrega_activos_fijos_items efi
 LEFT JOIN inventario i ON i.id = efi.item_id
 WHERE efi.entrega_activos_id = :id";
@@ -120,7 +122,8 @@ foreach ($items as $i => $item) {
 	}
 
 	$sheet->setCellValue($item['es_accesorio'] ? "R{$row}" : "S{$row}", "X");
-	$sheet->setCellValue("T{$row}", $item['accesorio_descripcion']);
+	$sheet->setCellValue("Q{$row}", $item['estado']);
+	$sheet->setCellValue("T{$row}", $item['descripcion_accesorio']);
 	$sheet->setCellValue("U{$row}", $item['observaciones']);
 	$sheet->getStyle("B{$row}:T{$row}")
 		->getAlignment()
