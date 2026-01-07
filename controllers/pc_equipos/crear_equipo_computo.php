@@ -106,11 +106,11 @@ try {
 		INSERT INTO pc_caracteristicas_tecnicas (
 			equipo_id, procesador, memoria_ram, disco_duro, tarjeta_video,
 			tarjeta_red, tarjeta_sonido, usb, unidad_cd, parlantes, drive,
-			monitor, teclado, mouse, internet, velocidad_red, capacidad_disco
+			monitor, monitor_id, teclado, teclado_id, mouse, mouse_id, internet, velocidad_red, capacidad_disco
 		) VALUES (
 			:equipo_id, :procesador, :memoria_ram, :disco_duro, :tarjeta_video,
 			:tarjeta_red, :tarjeta_sonido, :usb, :unidad_cd, :parlantes, :drive,
-			:monitor, :teclado, :mouse, :internet, :velocidad_red, :capacidad_disco
+			:monitor, :monitor_id, :teclado, :teclado_id, :mouse, :mouse_id, :internet, :velocidad_red, :capacidad_disco
 		)
 	");
 	$stmt->execute([
@@ -126,8 +126,11 @@ try {
 		"parlantes"       => $data["parlantes"] ?? null,
 		"drive"           => $data["drive"] ?? null,
 		"monitor"         => $data["monitor"] ?? null,
+		"monitor_id"      => $data["monitor_id"] ?? null,
 		"teclado"         => $data["teclado"] ?? null,
+		"teclado_id"      => $data["teclado_id"] ?? null,
 		"mouse"           => $data["mouse"] ?? null,
+		"mouse_id"        => $data["mouse_id"] ?? null,
 		"internet"        => $data["internet"] ?? null,
 		"velocidad_red"   => $data["velocidad_red"] ?? null,
 		"capacidad_disco" => $data["capacidad_disco"] ?? null

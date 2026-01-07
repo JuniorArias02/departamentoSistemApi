@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Recibir filtros
 $data = json_decode(file_get_contents("php://input"), true);
 $fechaInicio = $data['fecha_inicio'] ?? '2025-10-01';
-$fechaFin = $data['fecha_fin'] ?? '2025-12-31';
+$fechaFin = $data['fecha_fin'] ?? '2026-12-31';
 
 // Consulta 
 $sqlPedidos = "
@@ -33,7 +33,10 @@ SELECT
     p.observaciones_pedidos AS OBSERVACIONES_PEDIDOS,
     p.fecha_gerencia AS FECHA_RESPUESTA_SOLICITANTE,
     (
-        SELECT GROUP_CONCAT(i.nombre SEPARATOR ', ')
+        SELECT GROUP_CONCAT(
+        CONCAT(i.nombre, ' (', i.cantidad, ')')
+        SEPARATOR ', '
+    )
         FROM cp_items_pedidos i
         WHERE i.cp_pedido = p.id
     ) AS DESCRIPCION,

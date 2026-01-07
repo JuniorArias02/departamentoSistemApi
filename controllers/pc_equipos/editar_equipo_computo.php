@@ -88,7 +88,7 @@ try {
 			procesador = :procesador, memoria_ram = :memoria_ram, disco_duro = :disco_duro,
 			tarjeta_video = :tarjeta_video, tarjeta_red = :tarjeta_red, tarjeta_sonido = :tarjeta_sonido,
 			usb = :usb, unidad_cd = :unidad_cd, parlantes = :parlantes,
-			drive = :drive, monitor = :monitor, teclado = :teclado, mouse = :mouse,
+			drive = :drive, monitor = :monitor, monitor_id = :monitor_id, teclado = :teclado, teclado_id = :teclado_id, mouse = :mouse, mouse_id = :mouse_id,
 			internet = :internet, velocidad_red = :velocidad_red, capacidad_disco = :capacidad_disco
 		WHERE equipo_id = :equipo_id
 	");
@@ -105,8 +105,11 @@ try {
 		"parlantes"       => $data["parlantes"] ?? null,
 		"drive"           => $data["drive"] ?? null,
 		"monitor"         => $data["monitor"] ?? null,
+		"monitor_id"      => $data["monitor_id"] ?? null,
 		"teclado"         => $data["teclado"] ?? null,
+		"teclado_id"      => $data["teclado_id"] ?? null,
 		"mouse"           => $data["mouse"] ?? null,
+		"mouse_id"        => $data["mouse_id"] ?? null,
 		"internet"        => $data["internet"] ?? null,
 		"velocidad_red"   => $data["velocidad_red"] ?? null,
 		"capacidad_disco" => $data["capacidad_disco"] ?? null

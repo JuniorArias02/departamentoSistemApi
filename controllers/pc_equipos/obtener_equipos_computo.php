@@ -6,8 +6,8 @@ require_once __DIR__ . '/../rol/permisos/permisos.php';
 require_once __DIR__ . '/../rol/permisos/validador_permisos.php';
 
 try {
-$stmt = $pdo->prepare("
-    SELECT 
+    $stmt = $pdo->prepare("
+   SELECT 
         e.id,
         e.nombre_equipo,
         e.marca,
@@ -28,6 +28,8 @@ $stmt = $pdo->prepare("
         e.recomendaciones,
         e.equipos_adicionales,
         e.fecha_ingreso,
+        e.sede_id,
+        e.area_id,
 
         -- 🔹 Días restantes (último mantenimiento o fecha de ingreso)
         DATEDIFF(
@@ -57,8 +59,14 @@ $stmt = $pdo->prepare("
         c.parlantes,
         c.drive,
         c.monitor,
+        c.monitor_id,
+        inc.codigo AS monitor_codigo,
         c.teclado,
+        c.teclado_id,
+        inc2.codigo as teclado_codigo,
         c.mouse,
+        c.mouse_id,
+        inc3.codigo as mouse_codigo,
         c.internet,
         c.velocidad_red,
         c.capacidad_disco,
@@ -103,29 +111,33 @@ $stmt = $pdo->prepare("
     -- 🔹 Join a la tabla de configuración
     LEFT JOIN pc_config_cronograma cc ON 1=1
     LEFT JOIN p_cargo ps ON p.cargo_id = ps.id
-    ORDER BY e.id DESC
+    LEFT JOIN inventario inc  ON c.monitor_id = inc.id 
+    LEFT JOIN inventario inc2 ON c.teclado_id = inc2.id
+	LEFT JOIN inventario inc3 ON c.mouse_id   = inc3.id
+	ORDER BY e.id DESC
+    
 ");
 
 
-	$stmt->execute();
-	$equipos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute();
+    $equipos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	if (empty($equipos)) {
-		echo json_encode([
-			"status" => true,
-			"data" => [],
-			"message" => "No se encontraron equipos registrados."
-		]);
-		exit;
-	}
+    if (empty($equipos)) {
+        echo json_encode([
+            "status" => true,
+            "data" => [],
+            "message" => "No se encontraron equipos registrados."
+        ]);
+        exit;
+    }
 
-	echo json_encode([
-		"status" => true,
-		"data" => $equipos
-	]);
+    echo json_encode([
+        "status" => true,
+        "data" => $equipos
+    ]);
 } catch (PDOException $e) {
-	echo json_encode([
-		"status" => false,
-		"message" => "Error al obtener los equipos: " . $e->getMessage()
-	]);
+    echo json_encode([
+        "status" => false,
+        "message" => "Error al obtener los equipos: " . $e->getMessage()
+    ]);
 }
